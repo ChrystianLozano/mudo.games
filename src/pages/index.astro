@@ -310,7 +310,12 @@ try {
               >
                 <span class="timeline-date">
                   {video.published
-                    ? new Date(video.published).toLocaleDateString("es-MX")
+                    ? new Date(video.published).toLocaleDateString("es-MX", {
+                        weekday: "long",
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric"
+                      })
                     : "—"}
                 </span>
                 <span class="timeline-title">{video.title}</span>
