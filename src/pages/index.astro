@@ -7,7 +7,7 @@ const channelName = import.meta.env.YOUTUBE_CHANNEL_NAME ?? "mudo.games";
 const siteUrl = import.meta.env.SITE ?? "https://mudo.games";
 const pageTitle = `Últimos videos de ${channelName}`;
 const pageDescription =
-  "Explora los últimos videos, shorts y destacados de mudo.games con miniaturas, timeline y reproducción directa.";
+  "Explora los últimos videos, shorts y destacados de mudo.games con miniaturas, timeline y reproducción directa. Contacto: hola@mudo.games.";
 
 if (!channelId) {
   throw new Error("Falta YOUTUBE_CHANNEL_ID en el entorno (.env)");
@@ -104,6 +104,7 @@ try {
       <p class="sub">
         Gameplays más recientes. Destacado, spotlight, timeline y una sección
         especial para Shorts.
+        <span class="contact-line">hola@mudo.games</span>
       </p>
       <div class="hero-actions">
         <a

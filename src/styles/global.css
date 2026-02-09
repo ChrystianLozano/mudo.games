@@ -148,6 +148,14 @@ body {
   line-height: 1.6;
 }
 
+.contact-line {
+  display: block;
+  margin-top: 8px;
+  color: var(--accent-2);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
 .hero-actions {
   margin-top: 24px;
   display: flex;
@@ -249,6 +257,37 @@ body {
   border-radius: 26px;
   padding: 26px;
   box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.feature::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: conic-gradient(
+    from 120deg,
+    rgba(49, 230, 222, 0) 0deg,
+    rgba(49, 230, 222, 0.18) 60deg,
+    rgba(138, 247, 243, 0.25) 120deg,
+    rgba(49, 230, 222, 0) 200deg,
+    rgba(49, 230, 222, 0) 360deg
+  );
+  opacity: 0.7;
+  filter: blur(20px);
+  animation: featureGlow 12s linear infinite;
+  pointer-events: none;
+}
+
+.feature::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 24px;
+  border: 1px solid rgba(49, 230, 222, 0.25);
+  opacity: 0.6;
+  animation: featurePulse 5s ease-in-out infinite;
+  pointer-events: none;
 }
 
 .feature-copy h2 {
@@ -738,6 +777,27 @@ body {
   }
   100% {
     transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes featureGlow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes featurePulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(49, 230, 222, 0.0);
+    opacity: 0.5;
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(49, 230, 222, 0.25);
+    opacity: 0.9;
   }
 }
 
