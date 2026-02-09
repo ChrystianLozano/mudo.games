@@ -145,7 +145,12 @@ try {
           <strong class="stat-value">
             {
               latest?.published
-                ? new Date(latest.published).toLocaleDateString("es-MX")
+                ? new Date(latest.published).toLocaleDateString("es-MX", {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
                 : "—"
             }
           </strong>
@@ -175,7 +180,12 @@ try {
               <h2>{latest.title}</h2>
               <p class="meta">
                 Publicado:{" "}
-                {new Date(latest.published).toLocaleDateString("es-MX")}
+                {new Date(latest.published).toLocaleDateString("es-MX", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
               </p>
               <div class="chips">
                 <span>Nuevo</span>
@@ -248,7 +258,12 @@ try {
                   <p class="meta">
                     Publicado:{" "}
                     {video.published
-                      ? new Date(video.published).toLocaleDateString("es-MX")
+                      ? new Date(video.published).toLocaleDateString("es-MX", {
+                          weekday: "long",
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })
                       : ""}
                   </p>
                   <button
@@ -376,7 +391,12 @@ try {
                   <p class="meta">
                     Publicado:{" "}
                     {video.published
-                      ? new Date(video.published).toLocaleDateString("es-MX")
+                      ? new Date(video.published).toLocaleDateString("es-MX", {
+                          weekday: "long",
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })
                       : ""}
                   </p>
                   <button
