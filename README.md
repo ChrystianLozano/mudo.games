@@ -9,3 +9,5 @@ Sitio Astro para mostrar los ultimos videos del canal via YouTube RSS.
 ## Deploy
 
 Publicacion automatica diaria a las 2:01 PM (hora CDMX).
+
+Sitio: https://chrystianlozano.github.io/mudo.games
