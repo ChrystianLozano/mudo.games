@@ -1,7 +1,7 @@
 import { defineConfig } from "astro/config";
 
 export default defineConfig({
-  site: "https://chrystianlozano.github.io",
-  base: "/mudo.games",
+  site: "https://mudo.games",
+  base: "/",
   server: { port: 4321, host: true }
 });
