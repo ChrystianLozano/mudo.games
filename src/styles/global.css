@@ -225,6 +225,14 @@ body {
   margin: 0;
 }
 
+.section-title {
+  font-family: "Burbank Big Condensed", var(--font-title);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent-2);
+  text-shadow: 0 0 10px rgba(138, 247, 243, 0.35), 0 0 22px rgba(49, 230, 222, 0.2);
+}
+
 .section-head p {
   margin: 0;
   color: var(--muted);
