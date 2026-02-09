@@ -3,6 +3,9 @@ name: Deploy Astro to GitHub Pages
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: "1 19 * * *"
+    - cron: "1 20 * * *"
   workflow_dispatch:
 
 permissions:
@@ -17,20 +20,39 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      run_build: ${{ steps.timecheck.outputs.run_build }}
     steps:
       - uses: actions/checkout@v4
+      - id: timecheck
+        name: Check local time (CDMX)
+        run: |
+          now=$(TZ=America/Mexico_City date +%H:%M)
+          if [ "$now" = "14:01" ]; then
+            echo "run_build=true" >> "$GITHUB_OUTPUT"
+            echo "RUN_BUILD=true" >> "$GITHUB_ENV"
+          else
+            echo "run_build=false" >> "$GITHUB_OUTPUT"
+            echo "RUN_BUILD=false" >> "$GITHUB_ENV"
+            echo "Skipping: local time is $now"
+          fi
       - uses: actions/setup-node@v4
+        if: env.RUN_BUILD == 'true'
         with:
           node-version: 20
           cache: npm
       - run: npm ci
+        if: env.RUN_BUILD == 'true'
       - run: npm run build
+        if: env.RUN_BUILD == 'true'
       - uses: actions/upload-pages-artifact@v3
+        if: env.RUN_BUILD == 'true'
         with:
           path: ./dist
 
   deploy:
     needs: build
+    if: needs.build.outputs.run_build == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
