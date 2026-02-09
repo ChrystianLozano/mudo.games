@@ -37,6 +37,7 @@ try {
     const id = entry.videoId;
     const title = entry.title ?? "Video";
     const published = entry.published ?? "";
+    const description = entry?.group?.description ?? entry?.summary ?? "";
 
     const link = Array.isArray(entry.link)
       ? entry.link.find((l) => l.rel === "alternate")?.href
@@ -52,7 +53,7 @@ try {
       lowerTitle.includes("#shorts") ||
       lowerTitle.includes("short");
 
-    return { id, title, published, link, thumbnail, isShort };
+    return { id, title, published, link, thumbnail, isShort, description };
   });
   latest = videos[0] ?? null;
   spotlight = videos.slice(0, 3);
@@ -147,20 +148,23 @@ try {
                 <span>Feed oficial</span>
                 <span>Calidad HQ</span>
               </div>
-              <a
-                class="cta"
-                href={latest.link}
-                target="_blank"
-                rel="noreferrer"
+              <button
+                class="cta js-open-modal"
+                type="button"
+                data-id={latest.id}
+                data-title={latest.title}
+                data-description={latest.description}
               >
                 Ver estreno
-              </a>
+              </button>
             </div>
-            <a
-              class="feature-media"
-              href={latest.link}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              class="feature-media js-open-modal"
+              type="button"
+              data-id={latest.id}
+              data-title={latest.title}
+              data-description={latest.description}
+              aria-label={`Reproducir ${latest.title}`}
             >
               {latest.thumbnail ? (
                 <img
@@ -172,7 +176,7 @@ try {
                 <div class="thumb-fallback">Sin miniatura</div>
               )}
               <span class="play big">▶</span>
-            </a>
+            </button>
           </section>
         )
       }
@@ -186,11 +190,13 @@ try {
           {
             spotlight.map((video) => (
               <article class="card" key={video.id}>
-                <a
-                  class="thumb"
-                  href={video.link}
-                  target="_blank"
-                  rel="noreferrer"
+                <button
+                  class="thumb js-open-modal"
+                  type="button"
+                  data-id={video.id}
+                  data-title={video.title}
+                  data-description={video.description}
+                  aria-label={`Reproducir ${video.title}`}
                 >
                   {video.thumbnail ? (
                     <img
@@ -202,7 +208,7 @@ try {
                     <div class="thumb-fallback">Sin miniatura</div>
                   )}
                   <span class="play">▶</span>
-                </a>
+                </button>
                 <div class="card-body">
                   <h2>{video.title}</h2>
                   <p class="meta">
@@ -211,14 +217,15 @@ try {
                       ? new Date(video.published).toLocaleDateString("es-MX")
                       : ""}
                   </p>
-                  <a
-                    class="link"
-                    href={video.link}
-                    target="_blank"
-                    rel="noreferrer"
+                  <button
+                    class="link js-open-modal"
+                    type="button"
+                    data-id={video.id}
+                    data-title={video.title}
+                    data-description={video.description}
                   >
                     Ver video
-                  </a>
+                  </button>
                 </div>
               </article>
             ))
@@ -235,12 +242,14 @@ try {
           {
             shorts.length > 0 ? (
               shorts.map((video) => (
-                <a
-                  class="short-card"
+                <button
+                  class="short-card js-open-modal"
                   key={video.id}
-                  href={video.link}
-                  target="_blank"
-                  rel="noreferrer"
+                  type="button"
+                  data-id={video.id}
+                  data-title={video.title}
+                  data-description={video.description}
+                  aria-label={`Reproducir ${video.title}`}
                 >
                   {video.thumbnail ? (
                     <img
@@ -255,7 +264,7 @@ try {
                     <span>Short</span>
                     <h4>{video.title}</h4>
                   </div>
-                </a>
+                </button>
               ))
             ) : (
               <div class="empty">
@@ -274,12 +283,13 @@ try {
         <div class="timeline-list">
           {
             timeline.map((video) => (
-              <a
-                class="timeline-item"
+              <button
+                class="timeline-item js-open-modal"
                 key={video.id}
-                href={video.link}
-                target="_blank"
-                rel="noreferrer"
+                type="button"
+                data-id={video.id}
+                data-title={video.title}
+                data-description={video.description}
               >
                 <span class="timeline-date">
                   {video.published
@@ -288,7 +298,7 @@ try {
                 </span>
                 <span class="timeline-title">{video.title}</span>
                 <span class="timeline-arrow">↗</span>
-              </a>
+              </button>
             ))
           }
         </div>
@@ -303,11 +313,13 @@ try {
           {
             videos.map((video) => (
               <article class="card" key={video.id}>
-                <a
-                  class="thumb"
-                  href={video.link}
-                  target="_blank"
-                  rel="noreferrer"
+                <button
+                  class="thumb js-open-modal"
+                  type="button"
+                  data-id={video.id}
+                  data-title={video.title}
+                  data-description={video.description}
+                  aria-label={`Reproducir ${video.title}`}
                 >
                   {video.thumbnail ? (
                     <img
@@ -319,7 +331,7 @@ try {
                     <div class="thumb-fallback">Sin miniatura</div>
                   )}
                   <span class="play">▶</span>
-                </a>
+                </button>
                 <div class="card-body">
                   <h2>{video.title}</h2>
                   <p class="meta">
@@ -328,14 +340,15 @@ try {
                       ? new Date(video.published).toLocaleDateString("es-MX")
                       : ""}
                   </p>
-                  <a
-                    class="link"
-                    href={video.link}
-                    target="_blank"
-                    rel="noreferrer"
+                  <button
+                    class="link js-open-modal"
+                    type="button"
+                    data-id={video.id}
+                    data-title={video.title}
+                    data-description={video.description}
                   >
                     Ver video
-                  </a>
+                  </button>
                 </div>
               </article>
             ))
@@ -344,15 +357,135 @@ try {
       </section>
     </main>
 
+    <div class="modal" id="video-modal" aria-hidden="true">
+      <div class="modal-backdrop" data-close="true"></div>
+      <div
+        class="modal-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+      >
+        <button
+          class="modal-close"
+          type="button"
+          aria-label="Cerrar"
+          data-close="true"
+        >
+          ✕
+        </button>
+        <div class="modal-media">
+          <iframe
+            id="modal-iframe"
+            title="Reproductor de YouTube"
+            src=""
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen></iframe>
+        </div>
+        <div class="modal-info">
+          <p class="eyebrow">Reproduciendo</p>
+          <h3 id="modal-title"></h3>
+          <p id="modal-description" class="modal-desc"></p>
+          <a
+            id="modal-link"
+            class="cta modal-cta"
+            href="#"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Ver en YouTube
+          </a>
+        </div>
+      </div>
+    </div>
+
     <footer class="footer">
       <span
         >Hecho con Astro + YouTube RSS - desarrollado por <a
-          href="https://chrystian.dev">chrystian.dev</a
-        > by Chrystian Fabian Lozano Ramirez</span
+          href="https://chrystian.dev">Chrystian Fabian Lozano Ramirez</a
+        ></span
       >
     </footer>
 
     <script is:inline>
+      const modal = document.querySelector("#video-modal");
+      const iframe = document.querySelector("#modal-iframe");
+      const title = document.querySelector("#modal-title");
+      const description = document.querySelector("#modal-description");
+      const link = document.querySelector("#modal-link");
+
+      let viewedSet = new Set();
+
+      try {
+        const stored = JSON.parse(localStorage.getItem("viewedVideos") || "[]");
+        if (Array.isArray(stored)) viewedSet = new Set(stored);
+      } catch {
+        viewedSet = new Set();
+      }
+
+      const syncViewed = (id) => {
+        if (!id) return;
+        document.querySelectorAll(`[data-id="${id}"]`).forEach((el) => {
+          el.classList.add("is-viewed");
+        });
+      };
+
+      viewedSet.forEach((id) => syncViewed(id));
+
+      const openModal = (data) => {
+        if (!data?.id) return;
+        const url = `https://www.youtube.com/embed/${data.id}?autoplay=1&rel=0`;
+        iframe.src = url;
+        title.textContent = data.title || "Video";
+        description.textContent =
+          data.description || "Sin descripcion disponible.";
+        link.href = `https://www.youtube.com/watch?v=${data.id}`;
+        modal.setAttribute("aria-hidden", "false");
+        modal.classList.add("is-open");
+        document.body.style.overflow = "hidden";
+
+        if (!viewedSet.has(data.id)) {
+          viewedSet.add(data.id);
+          try {
+            localStorage.setItem(
+              "viewedVideos",
+              JSON.stringify([...viewedSet]),
+            );
+          } catch {}
+        }
+        syncViewed(data.id);
+      };
+
+      const closeModal = () => {
+        modal.classList.add("is-closing");
+        modal.classList.remove("is-open");
+        document.body.style.overflow = "";
+        const cleanup = () => {
+          modal.setAttribute("aria-hidden", "true");
+          modal.classList.remove("is-closing");
+          iframe.src = "";
+        };
+        setTimeout(cleanup, 260);
+      };
+
+      document.querySelectorAll(".js-open-modal").forEach((el) => {
+        el.addEventListener("click", () => {
+          openModal({
+            id: el.dataset.id,
+            title: el.dataset.title,
+            description: el.dataset.description,
+          });
+        });
+      });
+
+      modal.addEventListener("click", (event) => {
+        if (event.target?.dataset?.close === "true") closeModal();
+      });
+
+      window.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") closeModal();
+      });
+
       const root = document.documentElement;
       const mq = window.matchMedia("(pointer: fine)");
 

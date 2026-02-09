@@ -171,10 +171,12 @@ body {
   border-radius: 999px;
   text-decoration: none;
   font-weight: 700;
+  border: none;
   box-shadow: 0 16px 34px rgba(49, 230, 222, 0.25);
   transition: transform 0.2s ease, box-shadow 0.2s ease, background-position 0.3s ease;
   background-size: 200% 200%;
   background-position: 0% 50%;
+  cursor: pointer;
 }
 
 .cta:hover {
@@ -331,6 +333,13 @@ body {
   display: block;
   aspect-ratio: 16 / 9;
   overflow: hidden;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
 }
 
 .thumb img {
@@ -368,9 +377,7 @@ body {
   transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
-.thumb:visited .play,
-.feature-media:visited .play,
-.short-card:visited .play {
+.is-viewed .play {
   color: #6b7f82;
   border-color: rgba(107, 127, 130, 0.5);
   background: rgba(7, 18, 20, 0.65);
@@ -409,6 +416,12 @@ body {
   text-decoration: none;
   font-weight: 700;
   margin-top: auto;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
 }
 
 .link:hover {
@@ -457,6 +470,9 @@ body {
   color: var(--text);
   aspect-ratio: 9 / 16;
   min-height: 320px;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
 }
 
 .short-card img {
@@ -511,6 +527,20 @@ body {
   text-decoration: none;
   color: var(--text);
   transition: transform 0.2s ease, border-color 0.2s ease;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.feature-media {
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
 }
 
 .timeline-item:hover {
@@ -530,6 +560,124 @@ body {
 .timeline-arrow {
   text-align: right;
   color: var(--accent);
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  z-index: 20;
+}
+
+.modal.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal.is-closing {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(3, 12, 14, 0.7);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity 0.25s ease, backdrop-filter 0.25s ease;
+}
+
+.modal.is-open .modal-backdrop {
+  opacity: 1;
+  backdrop-filter: blur(8px);
+}
+
+.modal.is-closing .modal-backdrop {
+  opacity: 0;
+  backdrop-filter: blur(2px);
+}
+
+.modal-card {
+  position: relative;
+  z-index: 2;
+  width: min(1100px, 92vw);
+  background: #0b1c1f;
+  border: 1px solid rgba(49, 230, 222, 0.25);
+  border-radius: 20px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  display: grid;
+  grid-template-columns: minmax(280px, 1.1fr) minmax(240px, 0.9fr);
+  gap: 24px;
+  padding: 24px;
+  transform: translateY(12px) scale(0.98);
+  opacity: 0;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.modal.is-open .modal-card {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.modal.is-closing .modal-card {
+  transform: translateY(8px) scale(0.98);
+  opacity: 0;
+}
+
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: rgba(6, 24, 26, 0.7);
+  border: 1px solid rgba(49, 230, 222, 0.4);
+  color: var(--accent-2);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.modal-media {
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  background: #071215;
+}
+
+.modal-media iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.modal-info {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.modal-info h3 {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: clamp(20px, 2.2vw, 28px);
+}
+
+.modal-desc {
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0;
+  max-height: 220px;
+  overflow: auto;
+}
+
+.modal-cta {
+  align-self: start;
 }
 
 @keyframes rise {
@@ -592,5 +740,9 @@ body {
 
   .timeline-arrow {
     justify-self: start;
+  }
+
+  .modal-card {
+    grid-template-columns: 1fr;
   }
 }
