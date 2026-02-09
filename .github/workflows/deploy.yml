@@ -32,7 +32,7 @@ jobs:
             exit 0
           fi
           now=$(TZ=America/Mexico_City date +%H:%M)
-          if [ "$now" = "14:01" ]; then
+          if [[ "$now" > "14:00" && "$now" < "14:10" ]]; then
             echo "run_build=true" >> "$GITHUB_OUTPUT"
           else
             echo "run_build=false" >> "$GITHUB_OUTPUT"
