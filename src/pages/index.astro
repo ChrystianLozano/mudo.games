@@ -1,0 +1,371 @@
+---
+import "../styles/global.css";
+import { XMLParser } from "fast-xml-parser";
+
+const channelId = import.meta.env.YOUTUBE_CHANNEL_ID;
+const channelName = import.meta.env.YOUTUBE_CHANNEL_NAME ?? "Nuestro canal";
+
+if (!channelId) {
+  throw new Error("Falta YOUTUBE_CHANNEL_ID en el entorno (.env)");
+}
+
+const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+
+let videos = [];
+let spotlight = [];
+let shorts = [];
+let timeline = [];
+let latest = null;
+let fetchError = "";
+
+try {
+  const res = await fetch(feedUrl);
+  if (!res.ok) throw new Error(`Respuesta ${res.status}`);
+  const xml = await res.text();
+
+  const parser = new XMLParser({
+    ignoreAttributes: false,
+    attributeNamePrefix: "",
+    removeNSPrefix: true,
+  });
+
+  const data = parser.parse(xml);
+  const entries = data?.feed?.entry ?? [];
+  const items = Array.isArray(entries) ? entries : [entries];
+
+  videos = items.slice(0, 10).map((entry) => {
+    const id = entry.videoId;
+    const title = entry.title ?? "Video";
+    const published = entry.published ?? "";
+
+    const link = Array.isArray(entry.link)
+      ? entry.link.find((l) => l.rel === "alternate")?.href
+      : entry.link?.href;
+
+    const thumbFromFeed = entry?.group?.thumbnail?.url;
+    const thumbnail =
+      thumbFromFeed ?? (id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : "");
+
+    const lowerTitle = title.toLowerCase();
+    const isShort =
+      (typeof link === "string" && link.includes("/shorts/")) ||
+      lowerTitle.includes("#shorts") ||
+      lowerTitle.includes("short");
+
+    return { id, title, published, link, thumbnail, isShort };
+  });
+  latest = videos[0] ?? null;
+  spotlight = videos.slice(0, 3);
+  shorts = videos.filter((video) => video.isShort).slice(0, 4);
+  timeline = videos.slice(0, 8);
+} catch (err) {
+  fetchError = err instanceof Error ? err.message : "No se pudo cargar el feed";
+}
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Últimos videos de YouTube" />
+    <title>Últimos videos | {channelName}</title>
+  </head>
+  <body>
+    <div class="bg">
+      <div class="glow"></div>
+      <div class="orb orb-a"></div>
+      <div class="orb orb-b"></div>
+      <div class="lines"></div>
+      <div class="grain"></div>
+    </div>
+
+    <header class="hero">
+      <p class="eyebrow">Nuevos lanzamientos</p>
+      <h1>Últimos videos de {channelName}</h1>
+      <p class="sub">
+        Gameplays más recientes. Destacado, spotlight, timeline y una sección
+        especial para Shorts.
+      </p>
+      <div class="hero-actions">
+        <a
+          class="cta"
+          href={`https://www.youtube.com/channel/${channelId}`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Ver canal completo
+        </a>
+        <span class="hint"
+          >Actualizado automáticamente desde el feed oficial</span
+        >
+      </div>
+      <div class="stats">
+        <div>
+          <span class="stat-label">Videos cargados</span>
+          <strong class="stat-value">{videos.length}</strong>
+        </div>
+        <div>
+          <span class="stat-label">Última publicación</span>
+          <strong class="stat-value">
+            {
+              latest?.published
+                ? new Date(latest.published).toLocaleDateString("es-MX")
+                : "—"
+            }
+          </strong>
+        </div>
+        <div>
+          <span class="stat-label">Shorts detectados</span>
+          <strong class="stat-value">{shorts.length}</strong>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+      {
+        fetchError && (
+          <div class="error">
+            <strong>No se pudo cargar el feed.</strong>
+            <span>{fetchError}</span>
+          </div>
+        )
+      }
+
+      {
+        latest && (
+          <section class="feature">
+            <div class="feature-copy">
+              <p class="eyebrow">Destacado</p>
+              <h2>{latest.title}</h2>
+              <p class="meta">
+                Publicado:{" "}
+                {new Date(latest.published).toLocaleDateString("es-MX")}
+              </p>
+              <div class="chips">
+                <span>Nuevo</span>
+                <span>Feed oficial</span>
+                <span>Calidad HQ</span>
+              </div>
+              <a
+                class="cta"
+                href={latest.link}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Ver estreno
+              </a>
+            </div>
+            <a
+              class="feature-media"
+              href={latest.link}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {latest.thumbnail ? (
+                <img
+                  src={latest.thumbnail}
+                  alt={`Miniatura de ${latest.title}`}
+                  loading="lazy"
+                />
+              ) : (
+                <div class="thumb-fallback">Sin miniatura</div>
+              )}
+              <span class="play big">▶</span>
+            </a>
+          </section>
+        )
+      }
+
+      <section class="spotlight">
+        <div class="section-head">
+          <h3>Spotlight</h3>
+          <p>Los tres lanzamientos más frescos listos para reproducirse.</p>
+        </div>
+        <div class="grid">
+          {
+            spotlight.map((video) => (
+              <article class="card" key={video.id}>
+                <a
+                  class="thumb"
+                  href={video.link}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {video.thumbnail ? (
+                    <img
+                      src={video.thumbnail}
+                      alt={`Miniatura de ${video.title}`}
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div class="thumb-fallback">Sin miniatura</div>
+                  )}
+                  <span class="play">▶</span>
+                </a>
+                <div class="card-body">
+                  <h2>{video.title}</h2>
+                  <p class="meta">
+                    Publicado:{" "}
+                    {video.published
+                      ? new Date(video.published).toLocaleDateString("es-MX")
+                      : ""}
+                  </p>
+                  <a
+                    class="link"
+                    href={video.link}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Ver video
+                  </a>
+                </div>
+              </article>
+            ))
+          }
+        </div>
+      </section>
+
+      <section class="shorts">
+        <div class="section-head">
+          <h3>Shorts</h3>
+          <p>Clips rápidos detectados por el feed.</p>
+        </div>
+        <div class="shorts-row">
+          {
+            shorts.length > 0 ? (
+              shorts.map((video) => (
+                <a
+                  class="short-card"
+                  key={video.id}
+                  href={video.link}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {video.thumbnail ? (
+                    <img
+                      src={video.thumbnail}
+                      alt={`Miniatura de ${video.title}`}
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div class="thumb-fallback">Sin miniatura</div>
+                  )}
+                  <div class="short-info">
+                    <span>Short</span>
+                    <h4>{video.title}</h4>
+                  </div>
+                </a>
+              ))
+            ) : (
+              <div class="empty">
+                No se detectaron Shorts en los últimos videos.
+              </div>
+            )
+          }
+        </div>
+      </section>
+
+      <section class="timeline">
+        <div class="section-head">
+          <h3>Timeline</h3>
+          <p>Una línea rápida con las publicaciones más recientes.</p>
+        </div>
+        <div class="timeline-list">
+          {
+            timeline.map((video) => (
+              <a
+                class="timeline-item"
+                key={video.id}
+                href={video.link}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span class="timeline-date">
+                  {video.published
+                    ? new Date(video.published).toLocaleDateString("es-MX")
+                    : "—"}
+                </span>
+                <span class="timeline-title">{video.title}</span>
+                <span class="timeline-arrow">↗</span>
+              </a>
+            ))
+          }
+        </div>
+      </section>
+
+      <section class="all-videos">
+        <div class="section-head">
+          <h3>Todos los últimos 10</h3>
+          <p>La lista completa del feed, lista para maratonear.</p>
+        </div>
+        <div class="grid">
+          {
+            videos.map((video) => (
+              <article class="card" key={video.id}>
+                <a
+                  class="thumb"
+                  href={video.link}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {video.thumbnail ? (
+                    <img
+                      src={video.thumbnail}
+                      alt={`Miniatura de ${video.title}`}
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div class="thumb-fallback">Sin miniatura</div>
+                  )}
+                  <span class="play">▶</span>
+                </a>
+                <div class="card-body">
+                  <h2>{video.title}</h2>
+                  <p class="meta">
+                    Publicado:{" "}
+                    {video.published
+                      ? new Date(video.published).toLocaleDateString("es-MX")
+                      : ""}
+                  </p>
+                  <a
+                    class="link"
+                    href={video.link}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Ver video
+                  </a>
+                </div>
+              </article>
+            ))
+          }
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span
+        >Hecho con Astro + YouTube RSS - desarrollado por <a
+          href="https://chrystian.dev">chrystian.dev</a
+        ></span
+      >
+    </footer>
+
+    <script is:inline>
+      const root = document.documentElement;
+      const mq = window.matchMedia("(pointer: fine)");
+
+      const setParallax = (event) => {
+        const x = (event.clientX / window.innerWidth) * 2 - 1;
+        const y = (event.clientY / window.innerHeight) * 2 - 1;
+        root.style.setProperty("--cursor-x", x.toFixed(3));
+        root.style.setProperty("--cursor-y", y.toFixed(3));
+      };
+
+      if (mq.matches) {
+        window.addEventListener("pointermove", setParallax, { passive: true });
+      }
+    </script>
+  </body>
+</html>
