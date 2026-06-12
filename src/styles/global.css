@@ -589,6 +589,10 @@ body {
   gap: 16px;
 }
 
+.shorts-row.few-shorts {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 280px));
+}
+
 .short-card {
   position: relative;
   border-radius: 18px;

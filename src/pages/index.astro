@@ -343,7 +343,7 @@ try {
           <h3 class="section-title">Shorts</h3>
           <p>Clips rápidos detectados por el feed.</p>
         </div>
-        <div class="shorts-row">
+        <div class={`shorts-row ${shorts.length <= 2 ? "few-shorts" : ""}`}>
           {
             shorts.length > 0 ? (
               shorts.map((video) => (
