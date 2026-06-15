@@ -60,7 +60,11 @@ try {
     return { id, title, published, link, thumbnail, isShort, description };
   });
   latest = videos[0] ?? null;
-  spotlight = videos.slice(1, 4);
+  const nonShorts = videos.filter((video) => !video.isShort);
+  const spotlightCandidates = latest && !latest.isShort
+    ? nonShorts.filter((video) => video.id !== latest.id)
+    : nonShorts;
+  spotlight = spotlightCandidates.slice(0, 3);
   shorts = videos.filter((video) => video.isShort).slice(0, 4);
   timeline = videos.slice(0, 8);
 } catch (err) {
