@@ -188,6 +188,7 @@ try {
           href={`https://www.youtube.com/channel/${channelId}`}
           target="_blank"
           rel="noreferrer"
+          id="hero-channel-cta"
         >
           Ver canal completo
         </a>
@@ -258,6 +259,7 @@ try {
                 data-id={latest.id}
                 data-title={latest.title}
                 data-description={latest.description}
+                id={`featured-play-btn-${latest.id}`}
               >
                 Ver estreno
               </button>
@@ -269,6 +271,7 @@ try {
               data-title={latest.title}
               data-description={latest.description}
               aria-label={`Reproducir ${latest.title}`}
+              id={`featured-media-btn-${latest.id}`}
             >
               {latest.thumbnail ? (
                 <img
@@ -287,7 +290,7 @@ try {
 
       <section class="spotlight">
         <div class="section-head">
-          <h3 class="section-title">Spotlight</h3>
+          <h2 class="section-title">Spotlight</h2>
           <p>Los tres lanzamientos más frescos listos para reproducirse.</p>
         </div>
         <div class="grid">
@@ -301,6 +304,7 @@ try {
                   data-title={video.title}
                   data-description={video.description}
                   aria-label={`Reproducir ${video.title}`}
+                  id={`spotlight-thumb-${video.id}`}
                 >
                   {video.thumbnail ? (
                     <img
@@ -314,7 +318,7 @@ try {
                   <span class="play">▶</span>
                 </button>
                 <div class="card-body">
-                  <h2>{video.title}</h2>
+                  <h3>{video.title}</h3>
                   <p class="meta">
                     Publicado:{" "}
                     {video.published
@@ -332,6 +336,7 @@ try {
                     data-id={video.id}
                     data-title={video.title}
                     data-description={video.description}
+                    id={`spotlight-link-${video.id}`}
                   >
                     Ver video
                   </button>
@@ -344,7 +349,7 @@ try {
 
       <section class="shorts">
         <div class="section-head">
-          <h3 class="section-title">Shorts</h3>
+          <h2 class="section-title">Shorts</h2>
           <p>Clips rápidos detectados por el feed.</p>
         </div>
         <div class={`shorts-row ${shorts.length <= 2 ? "few-shorts" : ""}`}>
@@ -359,6 +364,7 @@ try {
                   data-title={video.title}
                   data-description={video.description}
                   aria-label={`Reproducir ${video.title}`}
+                  id={`short-card-${video.id}`}
                 >
                   {video.thumbnail ? (
                     <img
@@ -371,7 +377,7 @@ try {
                   )}
                   <div class="short-info">
                     <span>Short</span>
-                    <h4>{video.title}</h4>
+                    <h3>{video.title}</h3>
                   </div>
                 </button>
               ))
@@ -386,7 +392,7 @@ try {
 
       <section class="timeline">
         <div class="section-head">
-          <h3 class="section-title">Timeline</h3>
+          <h2 class="section-title">Timeline</h2>
           <p>Una línea rápida con las publicaciones más recientes.</p>
         </div>
         <div class="timeline-list">
@@ -399,6 +405,7 @@ try {
                 data-id={video.id}
                 data-title={video.title}
                 data-description={video.description}
+                id={`timeline-item-${video.id}`}
               >
                 <span class="timeline-date">
                   {video.published
@@ -420,7 +427,7 @@ try {
 
       <section class="all-videos">
         <div class="section-head">
-          <h3 class="section-title">Todos los últimos {videos.length}</h3>
+          <h2 class="section-title">Todos los últimos {videos.length}</h2>
           <p>La lista completa del feed, lista para maratonear.</p>
         </div>
         <div class="grid">
@@ -434,6 +441,7 @@ try {
                   data-title={video.title}
                   data-description={video.description}
                   aria-label={`Reproducir ${video.title}`}
+                  id={`all-videos-thumb-${video.id}`}
                 >
                   {video.thumbnail ? (
                     <img
@@ -447,7 +455,7 @@ try {
                   <span class="play">▶</span>
                 </button>
                 <div class="card-body">
-                  <h2>{video.title}</h2>
+                  <h3>{video.title}</h3>
                   <p class="meta">
                     Publicado:{" "}
                     {video.published
@@ -465,6 +473,7 @@ try {
                     data-id={video.id}
                     data-title={video.title}
                     data-description={video.description}
+                    id={`all-videos-link-${video.id}`}
                   >
                     Ver video
                   </button>
@@ -489,6 +498,7 @@ try {
           type="button"
           aria-label="Cerrar"
           data-close="true"
+          id="modal-close-btn"
         >
           ✕
         </button>
@@ -527,7 +537,7 @@ try {
       <div class="social-wrap" aria-label="Redes sociales de mudo">
         <span class="social-title">Sígueme en</span>
         <div class="social-links">
-          <a href="https://tiktok.com/@mudo_" target="_blank" rel="noreferrer">
+          <a href="https://tiktok.com/@mudo_" target="_blank" rel="noreferrer" id="social-link-tiktok">
             <svg
               class="social-icon"
               viewBox="0 0 24 24"
@@ -541,7 +551,7 @@ try {
             </svg>
             TikTok
           </a>
-          <a href="https://twitter.com/mudo_" target="_blank" rel="noreferrer">
+          <a href="https://twitter.com/mudo_" target="_blank" rel="noreferrer" id="social-link-twitter">
             <svg
               class="social-icon"
               viewBox="0 0 24 24"
@@ -559,6 +569,7 @@ try {
             href="https://instagram.com/mudo_"
             target="_blank"
             rel="noreferrer"
+            id="social-link-instagram"
           >
             <svg
               class="social-icon"

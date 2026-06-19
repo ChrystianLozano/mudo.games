@@ -227,7 +227,7 @@ body {
   margin: 36px 0 20px;
 }
 
-.section-head h3 {
+.section-head h2 {
   font-family: var(--font-title);
   font-size: clamp(22px, 3vw, 30px);
   margin: 0;
@@ -464,7 +464,7 @@ body {
   flex: 1;
 }
 
-.card h2 {
+.card h3 {
   font-size: 18px;
   margin: 0;
   line-height: 1.4;
@@ -632,7 +632,7 @@ body {
   color: var(--accent-2);
 }
 
-.short-info h4 {
+.short-info h3 {
   margin: 0;
   font-size: 16px;
 }
