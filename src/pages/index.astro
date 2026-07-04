@@ -13,7 +13,7 @@ if (!channelId) {
   throw new Error("Falta YOUTUBE_CHANNEL_ID en el entorno (.env)");
 }
 
-const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}&t=${Date.now()}`;
 
 let videos = [];
 let spotlight = [];
