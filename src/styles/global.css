@@ -974,6 +974,7 @@ body {
   background-image: 
     linear-gradient(180deg, rgba(7, 26, 28, 0.9) 0%, rgba(7, 26, 28, 0.35) 35%, rgba(7, 26, 28, 0.4) 65%, rgba(7, 26, 28, 0.95) 100%),
     url('/spotlight-bg.jpg');
+  filter: brightness(0.38) saturate(0.6) contrast(1.05); /* Darkens and desaturates the yellow locker image */
 }
 
 .playlist-section.bg-fade-in::before {
@@ -1210,6 +1211,15 @@ body {
 
 .carousel-slide {
   flex: 0 0 460px;
+}
+
+@media (min-width: 721px) {
+  .is-spotlight .carousel-controls {
+    display: none !important; /* Hide navigation buttons on desktop since cards fit perfectly */
+  }
+  .is-spotlight .carousel-track {
+    justify-content: center !important; /* Center the cards simmetrically */
+  }
 }
 
 @media (max-width: 720px) {
