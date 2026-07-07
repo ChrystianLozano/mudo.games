@@ -14,18 +14,23 @@ if (!channelId) {
 }
 
 const playlistId = import.meta.env.YOUTUBE_PLAYLIST_ID ?? "PLqruPmqTbIPMyUyh_MS9FCc9lmvAGd1VA";
+const arcPlaylistId = "PLqruPmqTbIPOqkBTOa6rN15-kH0TufGP3";
+
 const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}&t=${Date.now()}`;
 const playlistFeedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${playlistId}&t=${Date.now()}`;
+const arcPlaylistFeedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${arcPlaylistId}&t=${Date.now()}`;
 
 let videos = [];
 let playlistVideos = [];
 let playlistTitle = "Serie Especial";
+let arcVideos = [];
+let arcPlaylistTitle = "Arc Raiders";
 let spotlight = [];
 let shorts = [];
-let timeline = [];
 let latest = null;
 let fetchError = "";
 let playlistError = "";
+let arcPlaylistError = "";
 
 const parser = new XMLParser({
   ignoreAttributes: false,
@@ -65,9 +70,10 @@ function parseFeed(xml) {
   return { title, videos: parsedVideos };
 }
 
-const [channelRes, playlistRes] = await Promise.allSettled([
+const [channelRes, playlistRes, arcPlaylistRes] = await Promise.allSettled([
   fetch(feedUrl),
   fetch(playlistFeedUrl),
+  fetch(arcPlaylistFeedUrl),
 ]);
 
 if (channelRes.status === "fulfilled" && channelRes.value.ok) {
@@ -82,7 +88,6 @@ if (channelRes.status === "fulfilled" && channelRes.value.ok) {
       : nonShorts;
     spotlight = spotlightCandidates.slice(0, 3);
     shorts = videos.filter((video) => video.isShort).slice(0, 4);
-    timeline = videos.slice(0, 8);
   } catch (err) {
     fetchError = err instanceof Error ? err.message : "Error al procesar canal";
   }
@@ -103,6 +108,21 @@ if (playlistRes.status === "fulfilled" && playlistRes.value.ok) {
   }
 } else {
   playlistError = playlistRes.status === "rejected" ? playlistRes.reason?.message : `Respuesta ${playlistRes.value?.status}`;
+}
+
+if (arcPlaylistRes.status === "fulfilled" && arcPlaylistRes.value.ok) {
+  try {
+    const xml = await arcPlaylistRes.value.text();
+    const parsed = parseFeed(xml);
+    arcVideos = parsed.videos;
+    if (parsed.title) {
+      arcPlaylistTitle = parsed.title;
+    }
+  } catch (err) {
+    arcPlaylistError = err instanceof Error ? err.message : "Error al procesar playlist de Arc Raiders";
+  }
+} else {
+  arcPlaylistError = arcPlaylistRes.status === "rejected" ? arcPlaylistRes.reason?.message : `Respuesta ${arcPlaylistRes.value?.status}`;
 }
 ---
 
@@ -212,8 +232,8 @@ if (playlistRes.status === "fulfilled" && playlistRes.value.ok) {
         Últimos videos de <span class="title-brand">mudo.games</span>
       </h1>
       <p class="sub">
-        Gameplays más recientes. Destacado, spotlight, timeline y una sección
-        especial para Shorts.
+        Gameplays más recientes. Destacado, spotlight, series especiales y una sección
+        para Shorts.
         <span class="contact-line">hola@mudo.games</span>
       </p>
       <div class="hero-actions">
@@ -257,9 +277,10 @@ if (playlistRes.status === "fulfilled" && playlistRes.value.ok) {
       </div>
     </header>
 
-    <main class="content">
-      {
-        fetchError && (
+    <main>
+      <div class="content">
+        {
+          fetchError && (
           <div class="error">
             <strong>No se pudo cargar el feed.</strong>
             <span>{fetchError}</span>
@@ -380,15 +401,16 @@ if (playlistRes.status === "fulfilled" && playlistRes.value.ok) {
           }
         </div>
       </section>
+      </div>
 
       {
         playlistVideos.length > 0 && (
-          <section class="playlist-section">
+          <section class="playlist-section is-fortnite">
             <div class="playlist-header">
               <div class="section-head">
                 <span class="playlist-badge">Serie Especial</span>
                 <h2 class="section-title playlist-title">{playlistTitle}</h2>
-                <p>Videos seleccionados de la lista de reproducción oficial.</p>
+                <p>Explora gameplays destacados, las mejores partidas y novedades de la comunidad del Battle Royale de Epic Games.</p>
                 <p class="playlist-support">Apóyame usando el código <strong>MUDO</strong> en la tienda <span>#EpicPartner</span></p>
               </div>
               <div class="carousel-controls">
@@ -454,7 +476,80 @@ if (playlistRes.status === "fulfilled" && playlistRes.value.ok) {
         )
       }
 
-      <section class="shorts">
+      {
+        arcVideos.length > 0 && (
+          <section class="playlist-section is-arc">
+            <div class="playlist-header">
+              <div class="section-head">
+                <span class="playlist-badge">Serie Especial</span>
+                <h2 class="section-title playlist-title">{arcPlaylistTitle}</h2>
+                <p>Explora la cobertura de Arc Raiders, el shooter de extracción en tercera persona.</p>
+              </div>
+              <div class="carousel-controls">
+                <button class="carousel-btn prev-btn" aria-label="Videos anteriores" type="button">←</button>
+                <button class="carousel-btn next-btn" aria-label="Videos siguientes" type="button">→</button>
+              </div>
+            </div>
+            <div class="carousel-container">
+              <div class="carousel-track">
+                {
+                  arcVideos.slice(0, 10).map((video) => (
+                    <article class="card playlist-card carousel-slide" key={video.id}>
+                      <button
+                        class="thumb js-open-modal"
+                        type="button"
+                        data-id={video.id}
+                        data-title={video.title}
+                        data-description={video.description}
+                        aria-label={`Reproducir ${video.title}`}
+                        id={`arc-thumb-${video.id}`}
+                      >
+                        {video.thumbnail ? (
+                          <img
+                            src={video.thumbnail}
+                            alt={`Miniatura de ${video.title}`}
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div class="thumb-fallback">Sin miniatura</div>
+                        )}
+                        <span class="play">▶</span>
+                      </button>
+                      <div class="card-body">
+                        <h3>{video.title}</h3>
+                        <p class="meta">
+                          Publicado:{" "}
+                          {video.published
+                            ? new Date(video.published).toLocaleDateString("es-MX", {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              })
+                            : ""}
+                        </p>
+                        <button
+                          class="link js-open-modal"
+                          type="button"
+                          data-id={video.id}
+                          data-title={video.title}
+                          data-description={video.description}
+                          id={`arc-link-${video.id}`}
+                        >
+                          Ver video
+                        </button>
+                      </div>
+                    </article>
+                  ))
+                }
+              </div>
+            </div>
+          </section>
+        )
+      }
+
+      <div class="content">
+        <section class="shorts">
         <div class="section-head">
           <h2 class="section-title">Shorts</h2>
           <p>Clips rápidos detectados por el feed.</p>
@@ -493,41 +588,6 @@ if (playlistRes.status === "fulfilled" && playlistRes.value.ok) {
                 No se detectaron Shorts en los últimos videos.
               </div>
             )
-          }
-        </div>
-      </section>
-
-      <section class="timeline">
-        <div class="section-head">
-          <h2 class="section-title">Timeline</h2>
-          <p>Una línea rápida con las publicaciones más recientes.</p>
-        </div>
-        <div class="timeline-list">
-          {
-            timeline.map((video) => (
-              <button
-                class="timeline-item js-open-modal"
-                key={video.id}
-                type="button"
-                data-id={video.id}
-                data-title={video.title}
-                data-description={video.description}
-                id={`timeline-item-${video.id}`}
-              >
-                <span class="timeline-date">
-                  {video.published
-                    ? new Date(video.published).toLocaleDateString("es-MX", {
-                        weekday: "long",
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })
-                    : "—"}
-                </span>
-                <span class="timeline-title">{video.title}</span>
-                <span class="timeline-arrow">↗</span>
-              </button>
-            ))
           }
         </div>
       </section>
@@ -590,6 +650,7 @@ if (playlistRes.status === "fulfilled" && playlistRes.value.ok) {
           }
         </div>
       </section>
+      </div>
     </main>
 
     <div class="modal" id="video-modal" aria-hidden="true">
@@ -620,12 +681,12 @@ if (playlistRes.status === "fulfilled" && playlistRes.value.ok) {
         </div>
         <div class="modal-info">
           <p class="eyebrow">Reproduciendo</p>
-          <h3 id="modal-title"></h3>
+          <h3 id="modal-title">Reproductor de video</h3>
           <p id="modal-description" class="modal-desc"></p>
           <a
             id="modal-link"
             class="cta modal-cta"
-            href="#"
+            href="https://www.youtube.com"
             target="_blank"
             rel="noreferrer"
           >
@@ -788,21 +849,43 @@ if (playlistRes.status === "fulfilled" && playlistRes.value.ok) {
         window.addEventListener("pointermove", setParallax, { passive: true });
       }
 
-      // Logic for Carousel Navigation
-      const track = document.querySelector(".carousel-track");
-      const prevBtn = document.querySelector(".prev-btn");
-      const nextBtn = document.querySelector(".next-btn");
+      // Background Fade-in on Scroll using Intersection Observer (multi-section support)
+      document.querySelectorAll(".playlist-section").forEach((section) => {
+        const obs = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                section.classList.add("bg-fade-in");
+              } else {
+                section.classList.remove("bg-fade-in");
+              }
+            });
+          },
+          { threshold: 0.15 }
+        );
+        obs.observe(section);
+      });
 
-      if (track && prevBtn && nextBtn) {
-        prevBtn.addEventListener("click", () => {
-          const scrollAmount = track.clientWidth * 0.75;
-          track.scrollBy({ left: -scrollAmount, behavior: "smooth" });
-        });
-        nextBtn.addEventListener("click", () => {
-          const scrollAmount = track.clientWidth * 0.75;
-          track.scrollBy({ left: scrollAmount, behavior: "smooth" });
-        });
-      }
+      // Logic for Carousel Navigation (multi-carousel support)
+      document.querySelectorAll(".carousel-container").forEach((container) => {
+        const track = container.querySelector(".carousel-track");
+        const section = container.closest(".playlist-section");
+        if (!track || !section) return;
+
+        const prevBtn = section.querySelector(".prev-btn");
+        const nextBtn = section.querySelector(".next-btn");
+
+        if (prevBtn && nextBtn) {
+          prevBtn.addEventListener("click", () => {
+            const scrollAmount = track.clientWidth * 0.75;
+            track.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+          });
+          nextBtn.addEventListener("click", () => {
+            const scrollAmount = track.clientWidth * 0.75;
+            track.scrollBy({ left: scrollAmount, behavior: "smooth" });
+          });
+        }
+      });
     </script>
   </body>
 </html>
