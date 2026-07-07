@@ -27,6 +27,8 @@
 }
 html {
   background-color: #071a1c;
+  scroll-snap-type: y proximity;
+  scroll-behavior: smooth;
 }
 
 * {
@@ -1211,6 +1213,20 @@ body {
 
 .carousel-slide {
   flex: 0 0 460px;
+}
+
+/* Scroll Snapping Alignments */
+.hero,
+.feature,
+.playlist-section,
+.shorts,
+.all-videos {
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+}
+
+.footer {
+  scroll-snap-align: end;
 }
 
 @media (min-width: 721px) {
