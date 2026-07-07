@@ -1169,7 +1169,7 @@ body {
 .carousel-container {
   position: relative;
   width: 100%;
-  padding: 10px 0 20px;
+  padding: 20px 0 30px;
   overflow: hidden;
   z-index: 2;
 }
@@ -1179,7 +1179,7 @@ body {
   gap: 24px;
   overflow-x: auto;
   scroll-behavior: smooth;
-  padding: 0 max(24px, calc((100vw - 1200px) / 2)) 16px;
+  padding: 20px max(24px, calc((100vw - 1200px) / 2)) 30px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   scrollbar-color: rgba(49, 230, 222, 0.3) rgba(11, 28, 31, 0.3);
