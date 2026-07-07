@@ -1234,44 +1234,97 @@ body {
     flex: 0 0 310px;
   }
 
-  /* Mobile performance optimizations to reduce memory and CPU load */
+  /* High-fidelity static mobile performance optimizations */
   .bg {
-    display: none !important; /* Disables heavy animated background elements (SVG grain noise, lines grid animation, blur effects, screen/soft-light blend modes) */
+    display: block !important; /* Keep background elements visible */
+  }
+
+  .grain {
+    display: none !important; /* Hide only the heavy feTurbulence noise SVG */
+  }
+
+  .glow, .orb, .lines {
+    animation: none !important; /* Stop background animations to save CPU/GPU scroll repaint cost */
+    transition: none !important;
+  }
+
+  .glow {
+    filter: blur(50px) !important; /* Static blurs are cached as textures, zero scroll overhead */
+    opacity: 0.55 !important;
+    transform: none !important;
+  }
+
+  .orb {
+    mix-blend-mode: normal !important; /* Standard transparency is highly optimized on mobile */
+    opacity: 0.15 !important;
+    transform: none !important;
+  }
+
+  .lines {
+    transform: none !important;
+    opacity: 0.3 !important;
   }
 
   .stats {
     backdrop-filter: none !important;
-    background: rgba(8, 32, 36, 0.95) !important;
+    background: linear-gradient(135deg, rgba(13, 44, 48, 0.96), rgba(7, 26, 28, 0.98)) !important;
+    border: 1px solid rgba(49, 230, 222, 0.2) !important;
+    border-top: 3px solid var(--accent) !important; /* Cyberpunk neon header accent */
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+    padding: 20px 22px !important;
   }
 
-  .playlist-card {
+  .stats > div {
+    border-bottom: 1px solid rgba(49, 230, 222, 0.12) !important;
+    padding-bottom: 12px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .stats > div:last-child {
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  .card, .playlist-card {
     backdrop-filter: none !important;
-    background: rgba(10, 24, 27, 0.96) !important;
+    background: linear-gradient(135deg, rgba(16, 36, 40, 0.98), rgba(8, 20, 22, 1)) !important;
+    border: 1px solid rgba(49, 230, 222, 0.25) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
   }
 
   .playlist-badge {
     backdrop-filter: none !important;
     background: rgba(49, 230, 222, 0.18) !important;
+    border: 1px solid rgba(49, 230, 222, 0.5) !important;
   }
 
   .playlist-support {
     backdrop-filter: none !important;
     background: rgba(7, 26, 28, 0.95) !important;
+    border: 1px solid rgba(49, 230, 222, 0.3) !important;
   }
 
   .carousel-btn {
     backdrop-filter: none !important;
     background: rgba(7, 26, 28, 0.95) !important;
+    border: 1px solid rgba(49, 230, 222, 0.4) !important;
   }
 
   .playlist-card .play {
     backdrop-filter: none !important;
   }
 
+  .feature {
+    background: linear-gradient(135deg, rgba(13, 44, 48, 0.95), rgba(7, 26, 28, 0.98)) !important;
+    border: 1px solid rgba(49, 230, 222, 0.3) !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55) !important;
+  }
+
   .feature::before {
     animation: none !important;
     filter: none !important;
-    background: rgba(49, 230, 222, 0.08) !important;
+    background: radial-gradient(circle at 80% 20%, rgba(49, 230, 222, 0.12), transparent 70%) !important;
   }
 
   .feature::after {
@@ -1279,10 +1332,14 @@ body {
     box-shadow: none !important;
   }
 
-  .title-brand,
+  .title-brand {
+    animation: none !important;
+    text-shadow: 0 0 16px rgba(138, 247, 243, 0.65), 0 0 32px rgba(49, 230, 222, 0.35) !important;
+  }
+
   .section-title {
     animation: none !important;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 12px rgba(49, 230, 222, 0.3) !important;
+    text-shadow: 0 0 12px rgba(138, 247, 243, 0.5), 0 0 24px rgba(49, 230, 222, 0.25) !important;
   }
 }
 
