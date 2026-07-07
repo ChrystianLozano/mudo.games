@@ -13,31 +13,33 @@ if (!channelId) {
   throw new Error("Falta YOUTUBE_CHANNEL_ID en el entorno (.env)");
 }
 
+const playlistId = import.meta.env.YOUTUBE_PLAYLIST_ID ?? "PLqruPmqTbIPMyUyh_MS9FCc9lmvAGd1VA";
 const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}&t=${Date.now()}`;
+const playlistFeedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${playlistId}&t=${Date.now()}`;
 
 let videos = [];
+let playlistVideos = [];
+let playlistTitle = "Serie Especial";
 let spotlight = [];
 let shorts = [];
 let timeline = [];
 let latest = null;
 let fetchError = "";
+let playlistError = "";
 
-try {
-  const res = await fetch(feedUrl);
-  if (!res.ok) throw new Error(`Respuesta ${res.status}`);
-  const xml = await res.text();
+const parser = new XMLParser({
+  ignoreAttributes: false,
+  attributeNamePrefix: "",
+  removeNSPrefix: true,
+});
 
-  const parser = new XMLParser({
-    ignoreAttributes: false,
-    attributeNamePrefix: "",
-    removeNSPrefix: true,
-  });
-
+function parseFeed(xml) {
   const data = parser.parse(xml);
+  const title = data?.feed?.title ?? "";
   const entries = data?.feed?.entry ?? [];
   const items = Array.isArray(entries) ? entries : [entries];
 
-  videos = items.slice(0, 20).map((entry) => {
+  const parsedVideos = items.map((entry) => {
     const id = entry.videoId;
     const title = entry.title ?? "Video";
     const published = entry.published ?? "";
@@ -59,16 +61,48 @@ try {
 
     return { id, title, published, link, thumbnail, isShort, description };
   });
-  latest = videos[0] ?? null;
-  const nonShorts = videos.filter((video) => !video.isShort);
-  const spotlightCandidates = latest && !latest.isShort
-    ? nonShorts.filter((video) => video.id !== latest.id)
-    : nonShorts;
-  spotlight = spotlightCandidates.slice(0, 3);
-  shorts = videos.filter((video) => video.isShort).slice(0, 4);
-  timeline = videos.slice(0, 8);
-} catch (err) {
-  fetchError = err instanceof Error ? err.message : "No se pudo cargar el feed";
+
+  return { title, videos: parsedVideos };
+}
+
+const [channelRes, playlistRes] = await Promise.allSettled([
+  fetch(feedUrl),
+  fetch(playlistFeedUrl),
+]);
+
+if (channelRes.status === "fulfilled" && channelRes.value.ok) {
+  try {
+    const xml = await channelRes.value.text();
+    const parsed = parseFeed(xml);
+    videos = parsed.videos;
+    latest = videos[0] ?? null;
+    const nonShorts = videos.filter((video) => !video.isShort);
+    const spotlightCandidates = latest && !latest.isShort
+      ? nonShorts.filter((video) => video.id !== latest.id)
+      : nonShorts;
+    spotlight = spotlightCandidates.slice(0, 3);
+    shorts = videos.filter((video) => video.isShort).slice(0, 4);
+    timeline = videos.slice(0, 8);
+  } catch (err) {
+    fetchError = err instanceof Error ? err.message : "Error al procesar canal";
+  }
+} else {
+  fetchError = channelRes.status === "rejected" ? channelRes.reason?.message : `Respuesta ${channelRes.value?.status}`;
+}
+
+if (playlistRes.status === "fulfilled" && playlistRes.value.ok) {
+  try {
+    const xml = await playlistRes.value.text();
+    const parsed = parseFeed(xml);
+    playlistVideos = parsed.videos;
+    if (parsed.title) {
+      playlistTitle = parsed.title;
+    }
+  } catch (err) {
+    playlistError = err instanceof Error ? err.message : "Error al procesar playlist";
+  }
+} else {
+  playlistError = playlistRes.status === "rejected" ? playlistRes.reason?.message : `Respuesta ${playlistRes.value?.status}`;
 }
 ---
 
@@ -346,6 +380,79 @@ try {
           }
         </div>
       </section>
+
+      {
+        playlistVideos.length > 0 && (
+          <section class="playlist-section">
+            <div class="playlist-header">
+              <div class="section-head">
+                <span class="playlist-badge">Serie Especial</span>
+                <h2 class="section-title playlist-title">{playlistTitle}</h2>
+                <p>Videos seleccionados de la lista de reproducción oficial.</p>
+                <p class="playlist-support">Apóyame usando el código <strong>MUDO</strong> en la tienda <span>#EpicPartner</span></p>
+              </div>
+              <div class="carousel-controls">
+                <button class="carousel-btn prev-btn" aria-label="Videos anteriores" type="button">←</button>
+                <button class="carousel-btn next-btn" aria-label="Videos siguientes" type="button">→</button>
+              </div>
+            </div>
+            <div class="carousel-container">
+              <div class="carousel-track">
+                {
+                  playlistVideos.slice(0, 10).map((video) => (
+                    <article class="card playlist-card carousel-slide" key={video.id}>
+                      <button
+                        class="thumb js-open-modal"
+                        type="button"
+                        data-id={video.id}
+                        data-title={video.title}
+                        data-description={video.description}
+                        aria-label={`Reproducir ${video.title}`}
+                        id={`playlist-thumb-${video.id}`}
+                      >
+                        {video.thumbnail ? (
+                          <img
+                            src={video.thumbnail}
+                            alt={`Miniatura de ${video.title}`}
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div class="thumb-fallback">Sin miniatura</div>
+                        )}
+                        <span class="play">▶</span>
+                      </button>
+                      <div class="card-body">
+                        <h3>{video.title}</h3>
+                        <p class="meta">
+                          Publicado:{" "}
+                          {video.published
+                            ? new Date(video.published).toLocaleDateString("es-MX", {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              })
+                            : ""}
+                        </p>
+                        <button
+                          class="link js-open-modal"
+                          type="button"
+                          data-id={video.id}
+                          data-title={video.title}
+                          data-description={video.description}
+                          id={`playlist-link-${video.id}`}
+                        >
+                          Ver video
+                        </button>
+                      </div>
+                    </article>
+                  ))
+                }
+              </div>
+            </div>
+          </section>
+        )
+      }
 
       <section class="shorts">
         <div class="section-head">
@@ -679,6 +786,22 @@ try {
 
       if (mq.matches) {
         window.addEventListener("pointermove", setParallax, { passive: true });
+      }
+
+      // Logic for Carousel Navigation
+      const track = document.querySelector(".carousel-track");
+      const prevBtn = document.querySelector(".prev-btn");
+      const nextBtn = document.querySelector(".next-btn");
+
+      if (track && prevBtn && nextBtn) {
+        prevBtn.addEventListener("click", () => {
+          const scrollAmount = track.clientWidth * 0.75;
+          track.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+        });
+        nextBtn.addEventListener("click", () => {
+          const scrollAmount = track.clientWidth * 0.75;
+          track.scrollBy({ left: scrollAmount, behavior: "smooth" });
+        });
       }
     </script>
   </body>
