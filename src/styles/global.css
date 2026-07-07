@@ -970,6 +970,12 @@ body {
     url('/arc-raiders-bg.jpg');
 }
 
+.playlist-section.is-spotlight::before {
+  background-image: 
+    linear-gradient(180deg, rgba(7, 26, 28, 0.9) 0%, rgba(7, 26, 28, 0.35) 35%, rgba(7, 26, 28, 0.4) 65%, rgba(7, 26, 28, 0.95) 100%),
+    url('/spotlight-bg.jpg');
+}
+
 .playlist-section.bg-fade-in::before {
   opacity: 1;
 }
@@ -1220,6 +1226,10 @@ body {
 
   .playlist-section.is-arc::before {
     background-position: 82% center; /* Focus on the main characters on mobile */
+  }
+
+  .playlist-section.is-spotlight::before {
+    background-position: center !important; /* Center the lockers on mobile */
   }
 
   .playlist-header {

@@ -343,65 +343,71 @@ if (arcPlaylistRes.status === "fulfilled" && arcPlaylistRes.value.ok) {
         )
       }
 
-      <section class="spotlight">
-        <div class="section-head">
-          <h2 class="section-title">Spotlight</h2>
-          <p>Los tres lanzamientos más frescos listos para reproducirse.</p>
+      </div>
+
+      <section class="playlist-section is-spotlight">
+        <div class="playlist-header">
+          <div class="section-head">
+            <span class="playlist-badge">Destacados</span>
+            <h2 class="section-title playlist-title">Spotlight</h2>
+            <p>Los tres lanzamientos más frescos listos para reproducirse.</p>
+          </div>
         </div>
-        <div class="grid">
-          {
-            spotlight.map((video) => (
-              <article class="card" key={video.id}>
-                <button
-                  class="thumb js-open-modal"
-                  type="button"
-                  data-id={video.id}
-                  data-title={video.title}
-                  data-description={video.description}
-                  aria-label={`Reproducir ${video.title}`}
-                  id={`spotlight-thumb-${video.id}`}
-                >
-                  {video.thumbnail ? (
-                    <img
-                      src={video.thumbnail}
-                      alt={`Miniatura de ${video.title}`}
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div class="thumb-fallback">Sin miniatura</div>
-                  )}
-                  <span class="play">▶</span>
-                </button>
-                <div class="card-body">
-                  <h3>{video.title}</h3>
-                  <p class="meta">
-                    Publicado:{" "}
-                    {video.published
-                      ? new Date(video.published).toLocaleDateString("es-MX", {
-                          weekday: "long",
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })
-                      : ""}
-                  </p>
+        <div class="carousel-container">
+          <div class="grid" style="max-width: 1200px; margin: 0 auto; padding: 0 24px; z-index: 2; position: relative; width: 100%;">
+            {
+              spotlight.map((video) => (
+                <article class="card playlist-card" key={video.id}>
                   <button
-                    class="link js-open-modal"
+                    class="thumb js-open-modal"
                     type="button"
                     data-id={video.id}
                     data-title={video.title}
                     data-description={video.description}
-                    id={`spotlight-link-${video.id}`}
+                    aria-label={`Reproducir ${video.title}`}
+                    id={`spotlight-thumb-${video.id}`}
                   >
-                    Ver video
+                    {video.thumbnail ? (
+                      <img
+                        src={video.thumbnail}
+                        alt={`Miniatura de ${video.title}`}
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div class="thumb-fallback">Sin miniatura</div>
+                    )}
+                    <span class="play">▶</span>
                   </button>
-                </div>
-              </article>
-            ))
-          }
+                  <div class="card-body">
+                    <h3>{video.title}</h3>
+                    <p class="meta">
+                      Publicado:{" "}
+                      {video.published
+                        ? new Date(video.published).toLocaleDateString("es-MX", {
+                            weekday: "long",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })
+                        : ""}
+                    </p>
+                    <button
+                      class="link js-open-modal"
+                      type="button"
+                      data-id={video.id}
+                      data-title={video.title}
+                      data-description={video.description}
+                      id={`spotlight-link-${video.id}`}
+                    >
+                      Ver video
+                    </button>
+                  </div>
+                </article>
+              ))
+            }
+          </div>
         </div>
       </section>
-      </div>
 
       {
         playlistVideos.length > 0 && (
