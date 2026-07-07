@@ -1198,6 +1198,14 @@ body {
     gap: 30px;
   }
 
+  .playlist-section.is-fortnite::before {
+    background-position: 28% center; /* Focus on the main llama on mobile */
+  }
+
+  .playlist-section.is-arc::before {
+    background-position: 82% center; /* Focus on the main characters on mobile */
+  }
+
   .playlist-header {
     flex-direction: column;
     align-items: flex-start;
