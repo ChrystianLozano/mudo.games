@@ -981,19 +981,19 @@ body {
 .playlist-section.is-fortnite::before {
   background-image: 
     linear-gradient(180deg, rgba(7, 26, 28, 0.9) 0%, rgba(7, 26, 28, 0.3) 35%, rgba(7, 26, 28, 0.4) 65%, rgba(7, 26, 28, 0.95) 100%),
-    url('/fortnite-bg.jpg');
+    url('/fortnite-bg.webp');
 }
 
 .playlist-section.is-arc::before {
   background-image: 
     linear-gradient(180deg, rgba(7, 26, 28, 0.9) 0%, rgba(7, 26, 28, 0.3) 35%, rgba(7, 26, 28, 0.4) 65%, rgba(7, 26, 28, 0.95) 100%),
-    url('/arc-raiders-bg.jpg');
+    url('/arc-raiders-bg.webp');
 }
 
 .playlist-section.is-spotlight::before {
   background-image: 
     linear-gradient(180deg, rgba(7, 26, 28, 0.9) 0%, rgba(7, 26, 28, 0.35) 35%, rgba(7, 26, 28, 0.4) 65%, rgba(7, 26, 28, 0.95) 100%),
-    url('/spotlight-bg.jpg');
+    url('/spotlight-bg.webp');
   filter: brightness(0.38) saturate(0.6) contrast(1.05); /* Darkens and desaturates the yellow locker image */
 }
 
