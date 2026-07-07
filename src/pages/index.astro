@@ -361,7 +361,7 @@ if (arcPlaylistRes.status === "fulfilled" && arcPlaylistRes.value.ok) {
           <div class="carousel-track">
             {
               spotlight.map((video) => (
-                <article class="card playlist-card carousel-slide" key={video.id}>
+                <article class="card playlist-card carousel-slide" key={video.id} style={video.thumbnail ? `--thumb-url: url('${video.thumbnail}')` : ''}>
                   <button
                     class="thumb js-open-modal"
                     type="button"
@@ -432,7 +432,7 @@ if (arcPlaylistRes.status === "fulfilled" && arcPlaylistRes.value.ok) {
               <div class="carousel-track">
                 {
                   playlistVideos.slice(0, 10).map((video) => (
-                    <article class="card playlist-card carousel-slide" key={video.id}>
+                    <article class="card playlist-card carousel-slide" key={video.id} style={video.thumbnail ? `--thumb-url: url('${video.thumbnail}')` : ''}>
                       <button
                         class="thumb js-open-modal"
                         type="button"
@@ -504,7 +504,7 @@ if (arcPlaylistRes.status === "fulfilled" && arcPlaylistRes.value.ok) {
               <div class="carousel-track">
                 {
                   arcVideos.slice(0, 10).map((video) => (
-                    <article class="card playlist-card carousel-slide" key={video.id}>
+                    <article class="card playlist-card carousel-slide" key={video.id} style={video.thumbnail ? `--thumb-url: url('${video.thumbnail}')` : ''}>
                       <button
                         class="thumb js-open-modal"
                         type="button"
@@ -610,7 +610,7 @@ if (arcPlaylistRes.status === "fulfilled" && arcPlaylistRes.value.ok) {
         <div class="grid">
           {
             videos.map((video) => (
-              <article class="card" key={video.id}>
+              <article class="card" key={video.id} style={video.thumbnail ? `--thumb-url: url('${video.thumbnail}')` : ''}>
                 <button
                   class="thumb js-open-modal"
                   type="button"
