@@ -352,12 +352,16 @@ if (arcPlaylistRes.status === "fulfilled" && arcPlaylistRes.value.ok) {
             <h2 class="section-title playlist-title">Spotlight</h2>
             <p>Los tres lanzamientos más frescos listos para reproducirse.</p>
           </div>
+          <div class="carousel-controls">
+            <button class="carousel-btn prev-btn" aria-label="Videos anteriores" type="button">←</button>
+            <button class="carousel-btn next-btn" aria-label="Videos siguientes" type="button">→</button>
+          </div>
         </div>
         <div class="carousel-container">
-          <div class="grid" style="max-width: 1200px; margin: 0 auto; padding: 0 24px; z-index: 2; position: relative; width: 100%;">
+          <div class="carousel-track">
             {
               spotlight.map((video) => (
-                <article class="card playlist-card" key={video.id}>
+                <article class="card playlist-card carousel-slide" key={video.id}>
                   <button
                     class="thumb js-open-modal"
                     type="button"
