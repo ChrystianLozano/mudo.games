@@ -1233,6 +1233,57 @@ body {
   .carousel-slide {
     flex: 0 0 310px;
   }
+
+  /* Mobile performance optimizations to reduce memory and CPU load */
+  .bg {
+    display: none !important; /* Disables heavy animated background elements (SVG grain noise, lines grid animation, blur effects, screen/soft-light blend modes) */
+  }
+
+  .stats {
+    backdrop-filter: none !important;
+    background: rgba(8, 32, 36, 0.95) !important;
+  }
+
+  .playlist-card {
+    backdrop-filter: none !important;
+    background: rgba(10, 24, 27, 0.96) !important;
+  }
+
+  .playlist-badge {
+    backdrop-filter: none !important;
+    background: rgba(49, 230, 222, 0.18) !important;
+  }
+
+  .playlist-support {
+    backdrop-filter: none !important;
+    background: rgba(7, 26, 28, 0.95) !important;
+  }
+
+  .carousel-btn {
+    backdrop-filter: none !important;
+    background: rgba(7, 26, 28, 0.95) !important;
+  }
+
+  .playlist-card .play {
+    backdrop-filter: none !important;
+  }
+
+  .feature::before {
+    animation: none !important;
+    filter: none !important;
+    background: rgba(49, 230, 222, 0.08) !important;
+  }
+
+  .feature::after {
+    animation: none !important;
+    box-shadow: none !important;
+  }
+
+  .title-brand,
+  .section-title {
+    animation: none !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 12px rgba(49, 230, 222, 0.3) !important;
+  }
 }
 
 
