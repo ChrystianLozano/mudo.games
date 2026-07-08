@@ -26,8 +26,8 @@
   --cursor-y: 0;
 }
 html {
-  background-color: #071a1c;
-  background: radial-gradient(1100px 760px at 12% 8%, rgba(49, 230, 222, 0.16), transparent),
+  background-color: var(--bg);
+  background-image: radial-gradient(1100px 760px at 12% 8%, rgba(49, 230, 222, 0.16), transparent),
     radial-gradient(900px 700px at 86% 20%, rgba(138, 247, 243, 0.14), transparent),
     linear-gradient(180deg, var(--bg), var(--bg-2));
 }
