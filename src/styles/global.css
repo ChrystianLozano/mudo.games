@@ -1420,5 +1420,28 @@ body {
   }
 }
 
+/* Load More Button for Mobile */
+.load-more-container {
+  display: none;
+  justify-content: center;
+  margin-top: 36px;
+  width: 100%;
+}
+
+@media (max-width: 720px) {
+  .load-more-container {
+    display: flex;
+  }
+  
+  .all-videos .grid .card:nth-child(n+5) {
+    display: none;
+  }
+  
+  .all-videos .grid .card.is-visible-mobile {
+    display: flex !important;
+    animation: rise 0.4s ease forwards;
+  }
+}
+
 
 

@@ -659,6 +659,11 @@ if (arcPlaylistRes.status === "fulfilled" && arcPlaylistRes.value.ok) {
             ))
           }
         </div>
+        <div class="load-more-container">
+          <button id="load-more-btn" class="cta" type="button">
+            Mostrar más
+          </button>
+        </div>
       </section>
       </div>
     </main>
@@ -896,6 +901,30 @@ if (arcPlaylistRes.status === "fulfilled" && arcPlaylistRes.value.ok) {
           });
         }
       });
+
+      // "Mostrar más" functionality for mobile
+      const loadMoreBtn = document.getElementById("load-more-btn");
+      if (loadMoreBtn) {
+        const allCards = document.querySelectorAll(".all-videos .grid .card");
+        let visibleCount = 4;
+
+        loadMoreBtn.addEventListener("click", () => {
+          let shown = 0;
+          for (let i = visibleCount; i < allCards.length; i++) {
+            if (shown < 4) {
+              allCards[i].classList.add("is-visible-mobile");
+              shown++;
+            } else {
+              break;
+            }
+          }
+          visibleCount += shown;
+
+          if (visibleCount >= allCards.length) {
+            loadMoreBtn.style.display = "none";
+          }
+        });
+      }
     </script>
   </body>
 </html>
