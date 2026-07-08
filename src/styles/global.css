@@ -1277,6 +1277,12 @@ body {
     flex: 0 0 310px;
   }
 
+  /* Limit visible videos to 4 on mobile devices in the special playlist sections */
+  .playlist-section.is-fortnite .carousel-slide:nth-child(n+5),
+  .playlist-section.is-arc .carousel-slide:nth-child(n+5) {
+    display: none !important;
+  }
+
   .stats > div {
     border-bottom: 1px solid rgba(49, 230, 222, 0.12) !important;
     padding-bottom: 12px !important;
