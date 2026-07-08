@@ -16,9 +16,9 @@ if (!channelId) {
 const playlistId = import.meta.env.YOUTUBE_PLAYLIST_ID ?? "PLqruPmqTbIPMyUyh_MS9FCc9lmvAGd1VA";
 const arcPlaylistId = "PLqruPmqTbIPOqkBTOa6rN15-kH0TufGP3";
 
-const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}&t=${Date.now()}`;
-const playlistFeedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${playlistId}&t=${Date.now()}`;
-const arcPlaylistFeedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${arcPlaylistId}&t=${Date.now()}`;
+const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+const playlistFeedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${playlistId}`;
+const arcPlaylistFeedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${arcPlaylistId}`;
 
 let videos = [];
 let playlistVideos = [];
