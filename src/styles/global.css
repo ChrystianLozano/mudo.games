@@ -348,7 +348,7 @@ body {
   height: 100%;
   object-fit: cover;
   transform: scale(1.02);
-  transition: transform 0.35s ease;
+  transition: transform 0.35s ease, opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .feature-media:hover img {
@@ -449,7 +449,7 @@ body {
   object-fit: cover;
   display: block;
   transform: scale(1.02);
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .card:hover .thumb img {
@@ -651,6 +651,7 @@ body {
   object-fit: cover;
   display: block;
   filter: saturate(1.1);
+  transition: opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .short-info {
@@ -1049,7 +1050,8 @@ body {
   object-fit: cover;
   filter: saturate(0.95) brightness(0.95);
   transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1), 
-              filter 0.5s ease;
+              filter 0.5s ease,
+              opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .playlist-card:hover .thumb img {
@@ -1442,6 +1444,15 @@ body {
     animation: rise 0.4s ease forwards;
   }
 }
+
+/* Elegant fade-in effect for loaded images */
+.fade-in-img {
+  opacity: 0;
+}
+.fade-in-img.loaded {
+  opacity: 1;
+}
+
 
 
 
