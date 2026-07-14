@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import { XMLParser } from "fast-xml-parser";
+import { ClientRouter } from "astro:transitions";
 
 const channelId = import.meta.env.YOUTUBE_CHANNEL_ID;
 const channelName = import.meta.env.YOUTUBE_CHANNEL_NAME ?? "mudo.games";
@@ -15,22 +16,27 @@ if (!channelId) {
 
 const playlistId = import.meta.env.YOUTUBE_PLAYLIST_ID ?? "PLqruPmqTbIPMyUyh_MS9FCc9lmvAGd1VA";
 const arcPlaylistId = "PLqruPmqTbIPOqkBTOa6rN15-kH0TufGP3";
+const detectivePlaylistId = "PLbDsnrkbw0DY";
 
 const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
 const playlistFeedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${playlistId}`;
 const arcPlaylistFeedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${arcPlaylistId}`;
+const detectivePlaylistFeedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${detectivePlaylistId}`;
 
 let videos = [];
 let playlistVideos = [];
 let playlistTitle = "Serie Especial";
 let arcVideos = [];
 let arcPlaylistTitle = "Arc Raiders";
+let detectiveVideos = [];
+let detectivePlaylistTitle = "Database Detective";
 let spotlight = [];
 let shorts = [];
 let latest = null;
 let fetchError = "";
 let playlistError = "";
 let arcPlaylistError = "";
+let detectivePlaylistError = "";
 
 const parser = new XMLParser({
   ignoreAttributes: false,
@@ -70,10 +76,11 @@ function parseFeed(xml) {
   return { title, videos: parsedVideos };
 }
 
-const [channelRes, playlistRes, arcPlaylistRes] = await Promise.allSettled([
+const [channelRes, playlistRes, arcPlaylistRes, detectivePlaylistRes] = await Promise.allSettled([
   fetch(feedUrl),
   fetch(playlistFeedUrl),
   fetch(arcPlaylistFeedUrl),
+  fetch(detectivePlaylistFeedUrl),
 ]);
 
 if (channelRes.status === "fulfilled" && channelRes.value.ok) {
@@ -123,6 +130,21 @@ if (arcPlaylistRes.status === "fulfilled" && arcPlaylistRes.value.ok) {
   }
 } else {
   arcPlaylistError = arcPlaylistRes.status === "rejected" ? arcPlaylistRes.reason?.message : `Respuesta ${arcPlaylistRes.value?.status}`;
+}
+
+if (detectivePlaylistRes.status === "fulfilled" && detectivePlaylistRes.value.ok) {
+  try {
+    const xml = await detectivePlaylistRes.value.text();
+    const parsed = parseFeed(xml);
+    detectiveVideos = parsed.videos;
+    if (parsed.title) {
+      detectivePlaylistTitle = parsed.title;
+    }
+  } catch (err) {
+    detectivePlaylistError = err instanceof Error ? err.message : "Error al procesar playlist de Database Detective";
+  }
+} else {
+  detectivePlaylistError = detectivePlaylistRes.status === "rejected" ? detectivePlaylistRes.reason?.message : `Respuesta ${detectivePlaylistRes.value?.status}`;
 }
 ---
 
@@ -223,6 +245,7 @@ if (arcPlaylistRes.status === "fulfilled" && arcPlaylistRes.value.ok) {
         }
       </style>
     </noscript>
+    <ClientRouter />
   </head>
   <body>
     <div class="bg">
@@ -427,8 +450,8 @@ if (arcPlaylistRes.status === "fulfilled" && arcPlaylistRes.value.ok) {
           <section class="playlist-section is-fortnite">
             <div class="playlist-header">
               <div class="section-head">
-                <span class="playlist-badge">Serie Especial</span>
-                <h2 class="section-title playlist-title">{playlistTitle}</h2>
+                <span class="playlist-badge" transition:name={`playlist-badge-${playlistId}`}>Serie Especial</span>
+                <h2 class="section-title playlist-title" transition:name={`playlist-title-${playlistId}`}>{playlistTitle}</h2>
                 <p>Explora gameplays destacados, las mejores partidas y novedades de la comunidad del Battle Royale de Epic Games.</p>
                 <p class="playlist-support">Apóyame usando el código <strong>MUDO</strong> en la tienda <span>#EpicPartner</span></p>
               </div>
@@ -440,7 +463,7 @@ if (arcPlaylistRes.status === "fulfilled" && arcPlaylistRes.value.ok) {
             <div class="carousel-container">
               <div class="carousel-track">
                 {
-                  playlistVideos.slice(0, 10).map((video) => (
+                  playlistVideos.slice(0, 4).map((video) => (
                     <article class="card playlist-card carousel-slide" key={video.id} style={video.thumbnail ? `--thumb-url: url('${video.thumbnail}')` : ''}>
                       <button
                         class="thumb js-open-modal"
@@ -490,6 +513,19 @@ if (arcPlaylistRes.status === "fulfilled" && arcPlaylistRes.value.ok) {
                     </article>
                   ))
                 }
+                {
+                  playlistVideos.length > 4 && (
+                    <article class="card playlist-card carousel-slide see-more-slide" style="--thumb-url: url('/fortnite-bg.webp')">
+                      <a href={`/playlist/${playlistId}`} class="see-more-link">
+                        <div class="see-more-content">
+                          <span class="icon">➜</span>
+                          <h3>Ver serie completa</h3>
+                          <p>Ver el resto de los videos</p>
+                        </div>
+                      </a>
+                    </article>
+                  )
+                }
               </div>
             </div>
           </section>
@@ -501,8 +537,8 @@ if (arcPlaylistRes.status === "fulfilled" && arcPlaylistRes.value.ok) {
           <section class="playlist-section is-arc">
             <div class="playlist-header">
               <div class="section-head">
-                <span class="playlist-badge">Serie Especial</span>
-                <h2 class="section-title playlist-title">{arcPlaylistTitle}</h2>
+                <span class="playlist-badge" transition:name={`playlist-badge-${arcPlaylistId}`}>Serie Especial</span>
+                <h2 class="section-title playlist-title" transition:name={`playlist-title-${arcPlaylistId}`}>{arcPlaylistTitle}</h2>
                 <p>Explora la cobertura de Arc Raiders, el shooter de extracción en tercera persona.</p>
               </div>
               <div class="carousel-controls">
@@ -513,7 +549,7 @@ if (arcPlaylistRes.status === "fulfilled" && arcPlaylistRes.value.ok) {
             <div class="carousel-container">
               <div class="carousel-track">
                 {
-                  arcVideos.slice(0, 10).map((video) => (
+                  arcVideos.slice(0, 4).map((video) => (
                     <article class="card playlist-card carousel-slide" key={video.id} style={video.thumbnail ? `--thumb-url: url('${video.thumbnail}')` : ''}>
                       <button
                         class="thumb js-open-modal"
@@ -562,6 +598,105 @@ if (arcPlaylistRes.status === "fulfilled" && arcPlaylistRes.value.ok) {
                       </div>
                     </article>
                   ))
+                }
+                {
+                  arcVideos.length > 4 && (
+                    <article class="card playlist-card carousel-slide see-more-slide" style="--thumb-url: url('/arc-raiders-bg.webp')">
+                      <a href={`/playlist/${arcPlaylistId}`} class="see-more-link">
+                        <div class="see-more-content">
+                          <span class="icon">➜</span>
+                          <h3>Ver serie completa</h3>
+                          <p>Ver el resto de los videos</p>
+                        </div>
+                      </a>
+                    </article>
+                  )
+                }
+              </div>
+            </div>
+          </section>
+        )
+      }
+
+      {
+        detectiveVideos.length > 0 && (
+          <section class="playlist-section is-detective">
+            <div class="playlist-header">
+              <div class="section-head">
+                <span class="playlist-badge" transition:name={`playlist-badge-${detectivePlaylistId}`}>Serie Especial</span>
+                <h2 class="section-title playlist-title" transition:name={`playlist-title-${detectivePlaylistId}`}>{detectivePlaylistTitle}</h2>
+                <p>Aprende SQL de forma divertida resolviendo casos misteriosos con Database Detective: Minor Crimes Division.</p>
+              </div>
+              <div class="carousel-controls">
+                <button class="carousel-btn prev-btn" aria-label="Videos anteriores" type="button">←</button>
+                <button class="carousel-btn next-btn" aria-label="Videos siguientes" type="button">→</button>
+              </div>
+            </div>
+            <div class="carousel-container">
+              <div class="carousel-track">
+                {
+                  detectiveVideos.slice(0, 4).map((video) => (
+                    <article class="card playlist-card carousel-slide" key={video.id} style={video.thumbnail ? `--thumb-url: url('${video.thumbnail}')` : ''}>
+                      <button
+                        class="thumb js-open-modal"
+                        type="button"
+                        data-id={video.id}
+                        data-title={video.title}
+                        data-description={video.description}
+                        aria-label={`Reproducir ${video.title}`}
+                        id={`detective-thumb-${video.id}`}
+                      >
+                        {video.thumbnail ? (
+                          <img
+                            src={video.thumbnail}
+                            alt={`Miniatura de ${video.title}`}
+                            loading="lazy"
+                            class="fade-in-img"
+                          />
+                        ) : (
+                          <div class="thumb-fallback">Sin miniatura</div>
+                        )}
+                        <span class="play">▶</span>
+                      </button>
+                      <div class="card-body">
+                        <h3>{video.title}</h3>
+                        <p class="meta">
+                          Publicado:{" "}
+                          {video.published
+                            ? new Date(video.published).toLocaleDateString("es-MX", {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              })
+                            : ""}
+                        </p>
+                        <button
+                          class="link js-open-modal"
+                          type="button"
+                          data-id={video.id}
+                          data-title={video.title}
+                          data-description={video.description}
+                          id={`detective-link-${video.id}`}
+                        >
+                          Ver video
+                        </button>
+                      </div>
+                    </article>
+                  ))
+                }
+                {
+                  detectiveVideos.length > 4 && (
+                    <article class="card playlist-card carousel-slide see-more-slide" style="--thumb-url: url('/detective-bg.jpg')">
+                      <a href={`/playlist/${detectivePlaylistId}`} class="see-more-link">
+                        <div class="see-more-content">
+                          <span class="icon">➜</span>
+                          <h3>Ver serie completa</h3>
+                          <p>Ver el resto de los videos</p>
+                        </div>
+                      </a>
+                    </article>
+                  )
                 }
               </div>
             </div>
@@ -785,173 +920,181 @@ if (arcPlaylistRes.status === "fulfilled" && arcPlaylistRes.value.ok) {
     </footer>
 
     <script is:inline>
-      const modal = document.querySelector("#video-modal");
-      const iframe = document.querySelector("#modal-iframe");
-      const title = document.querySelector("#modal-title");
-      const description = document.querySelector("#modal-description");
-      const link = document.querySelector("#modal-link");
+      document.addEventListener('astro:page-load', () => {
+        const modal = document.querySelector("#video-modal");
+        const iframe = document.querySelector("#modal-iframe");
+        const title = document.querySelector("#modal-title");
+        const description = document.querySelector("#modal-description");
+        const link = document.querySelector("#modal-link");
 
-      let viewedSet = new Set();
+        if (!modal || !iframe || !title || !description || !link) return;
 
-      try {
-        const stored = JSON.parse(localStorage.getItem("viewedVideos") || "[]");
-        if (Array.isArray(stored)) viewedSet = new Set(stored);
-      } catch {
-        viewedSet = new Set();
-      }
+        let viewedSet = new Set();
 
-      const syncViewed = (id) => {
-        if (!id) return;
-        document.querySelectorAll(`[data-id="${id}"]`).forEach((el) => {
-          el.classList.add("is-viewed");
-        });
-      };
-
-      viewedSet.forEach((id) => syncViewed(id));
-
-      const openModal = (data) => {
-        if (!data?.id) return;
-        const url = `https://www.youtube.com/embed/${data.id}?autoplay=1&rel=0`;
-        iframe.src = url;
-        title.textContent = data.title || "Video";
-        description.textContent =
-          data.description || "Sin descripcion disponible.";
-        link.href = `https://www.youtube.com/watch?v=${data.id}`;
-        modal.setAttribute("aria-hidden", "false");
-        modal.classList.add("is-open");
-        document.body.style.overflow = "hidden";
-
-        if (!viewedSet.has(data.id)) {
-          viewedSet.add(data.id);
-          try {
-            localStorage.setItem(
-              "viewedVideos",
-              JSON.stringify([...viewedSet]),
-            );
-          } catch {}
+        try {
+          const stored = JSON.parse(localStorage.getItem("viewedVideos") || "[]");
+          if (Array.isArray(stored)) viewedSet = new Set(stored);
+        } catch {
+          viewedSet = new Set();
         }
-        syncViewed(data.id);
-      };
 
-      const closeModal = () => {
-        modal.classList.add("is-closing");
-        modal.classList.remove("is-open");
-        document.body.style.overflow = "";
-        const cleanup = () => {
-          modal.setAttribute("aria-hidden", "true");
-          modal.classList.remove("is-closing");
-          iframe.src = "";
+        const syncViewed = (id) => {
+          if (!id) return;
+          document.querySelectorAll(`[data-id="${id}"]`).forEach((el) => {
+            el.classList.add("is-viewed");
+          });
         };
-        setTimeout(cleanup, 260);
-      };
 
-      document.querySelectorAll(".js-open-modal").forEach((el) => {
-        el.addEventListener("click", () => {
-          openModal({
-            id: el.dataset.id,
-            title: el.dataset.title,
-            description: el.dataset.description,
-          });
-        });
-      });
+        viewedSet.forEach((id) => syncViewed(id));
 
-      modal.addEventListener("click", (event) => {
-        if (event.target?.dataset?.close === "true") closeModal();
-      });
+        const openModal = (data) => {
+          if (!data?.id) return;
+          const url = `https://www.youtube.com/embed/${data.id}?autoplay=1&rel=0`;
+          iframe.src = url;
+          title.textContent = data.title || "Video";
+          description.textContent =
+            data.description || "Sin descripcion disponible.";
+          link.href = `https://www.youtube.com/watch?v=${data.id}`;
+          modal.setAttribute("aria-hidden", "false");
+          modal.classList.add("is-open");
+          document.body.style.overflow = "hidden";
 
-      window.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") closeModal();
-      });
+          if (!viewedSet.has(data.id)) {
+            viewedSet.add(data.id);
+            try {
+              localStorage.setItem(
+                "viewedVideos",
+                JSON.stringify([...viewedSet]),
+              );
+            } catch {}
+          }
+          syncViewed(data.id);
+        };
 
-      const root = document.documentElement;
-      const mq = window.matchMedia("(pointer: fine)");
+        const closeModal = () => {
+          modal.classList.add("is-closing");
+          modal.classList.remove("is-open");
+          document.body.style.overflow = "";
+          const cleanup = () => {
+            modal.setAttribute("aria-hidden", "true");
+            modal.classList.remove("is-closing");
+            iframe.src = "";
+          };
+          setTimeout(cleanup, 260);
+        };
 
-      const setParallax = (event) => {
-        const x = (event.clientX / window.innerWidth) * 2 - 1;
-        const y = (event.clientY / window.innerHeight) * 2 - 1;
-        root.style.setProperty("--cursor-x", x.toFixed(3));
-        root.style.setProperty("--cursor-y", y.toFixed(3));
-      };
-
-      if (mq.matches) {
-        window.addEventListener("pointermove", setParallax, { passive: true });
-      }
-
-      // Background Fade-in on Scroll using Intersection Observer (multi-section support)
-      document.querySelectorAll(".playlist-section").forEach((section) => {
-        const obs = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                section.classList.add("bg-fade-in");
-              } else {
-                section.classList.remove("bg-fade-in");
-              }
+        document.querySelectorAll(".js-open-modal").forEach((el) => {
+          el.addEventListener("click", () => {
+            openModal({
+              id: el.dataset.id,
+              title: el.dataset.title,
+              description: el.dataset.description,
             });
-          },
-          { threshold: 0.15 }
-        );
-        obs.observe(section);
-      });
-
-      // Logic for Carousel Navigation (multi-carousel support)
-      document.querySelectorAll(".carousel-container").forEach((container) => {
-        const track = container.querySelector(".carousel-track");
-        const section = container.closest(".playlist-section");
-        if (!track || !section) return;
-
-        const prevBtn = section.querySelector(".prev-btn");
-        const nextBtn = section.querySelector(".next-btn");
-
-        if (prevBtn && nextBtn) {
-          prevBtn.addEventListener("click", () => {
-            const scrollAmount = track.clientWidth * 0.75;
-            track.scrollBy({ left: -scrollAmount, behavior: "smooth" });
           });
-          nextBtn.addEventListener("click", () => {
-            const scrollAmount = track.clientWidth * 0.75;
-            track.scrollBy({ left: scrollAmount, behavior: "smooth" });
-          });
+        });
+
+        // Use a new handler to avoid stacking window keydowns
+        const handleKeyDown = (event) => {
+          if (event.key === "Escape") closeModal();
+        };
+
+        modal.addEventListener("click", (event) => {
+          if (event.target?.dataset?.close === "true") closeModal();
+        });
+
+        window.removeEventListener("keydown", handleKeyDown);
+        window.addEventListener("keydown", handleKeyDown);
+
+        const root = document.documentElement;
+        const mq = window.matchMedia("(pointer: fine)");
+
+        const setParallax = (event) => {
+          const x = (event.clientX / window.innerWidth) * 2 - 1;
+          const y = (event.clientY / window.innerHeight) * 2 - 1;
+          root.style.setProperty("--cursor-x", x.toFixed(3));
+          root.style.setProperty("--cursor-y", y.toFixed(3));
+        };
+
+        if (mq.matches) {
+          window.removeEventListener("pointermove", setParallax);
+          window.addEventListener("pointermove", setParallax, { passive: true });
         }
-      });
 
-      // "Mostrar más" functionality for mobile
-      const loadMoreBtn = document.getElementById("load-more-btn");
-      if (loadMoreBtn) {
-        const allCards = document.querySelectorAll(".all-videos .grid .card");
-        let visibleCount = 4;
+        // Background Fade-in on Scroll using Intersection Observer (multi-section support)
+        document.querySelectorAll(".playlist-section").forEach((section) => {
+          const obs = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  section.classList.add("bg-fade-in");
+                } else {
+                  section.classList.remove("bg-fade-in");
+                }
+              });
+            },
+            { threshold: 0.15 }
+          );
+          obs.observe(section);
+        });
 
-        loadMoreBtn.addEventListener("click", () => {
-          let shown = 0;
-          for (let i = visibleCount; i < allCards.length; i++) {
-            if (shown < 4) {
-              allCards[i].classList.add("is-visible-mobile");
-              shown++;
-            } else {
-              break;
-            }
-          }
-          visibleCount += shown;
+        // Logic for Carousel Navigation (multi-carousel support)
+        document.querySelectorAll(".carousel-container").forEach((container) => {
+          const track = container.querySelector(".carousel-track");
+          const section = container.closest(".playlist-section");
+          if (!track || !section) return;
 
-          if (visibleCount >= allCards.length) {
-            loadMoreBtn.style.display = "none";
+          const prevBtn = section.querySelector(".prev-btn");
+          const nextBtn = section.querySelector(".next-btn");
+
+          if (prevBtn && nextBtn) {
+            prevBtn.addEventListener("click", () => {
+              const scrollAmount = track.clientWidth * 0.75;
+              track.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+            });
+            nextBtn.addEventListener("click", () => {
+              const scrollAmount = track.clientWidth * 0.75;
+              track.scrollBy({ left: scrollAmount, behavior: "smooth" });
+            });
           }
         });
-      }
 
-      // Elegante efecto fade-in cuando carguen las imágenes por completo
-      const handleImageLoad = (img) => {
-        img.classList.add("loaded");
-      };
+        // "Mostrar más" functionality for mobile
+        const loadMoreBtn = document.getElementById("load-more-btn");
+        if (loadMoreBtn) {
+          const allCards = document.querySelectorAll(".all-videos .grid .card");
+          let visibleCount = 4;
 
-      document.querySelectorAll(".fade-in-img").forEach((img) => {
-        if (img.complete) {
-          handleImageLoad(img);
-        } else {
-          img.addEventListener("load", () => handleImageLoad(img));
-          // En caso de error, la mostramos igualmente para no dejar el hueco vacío permanentemente
-          img.addEventListener("error", () => handleImageLoad(img));
+          loadMoreBtn.addEventListener("click", () => {
+            let shown = 0;
+            for (let i = visibleCount; i < allCards.length; i++) {
+              if (shown < 4) {
+                allCards[i].classList.add("is-visible-mobile");
+                shown++;
+              } else {
+                break;
+              }
+            }
+            visibleCount += shown;
+
+            if (visibleCount >= allCards.length) {
+              loadMoreBtn.style.display = "none";
+            }
+          });
         }
+
+        // Elegante efecto fade-in cuando carguen las imágenes por completo
+        const handleImageLoad = (img) => {
+          img.classList.add("loaded");
+        };
+
+        document.querySelectorAll(".fade-in-img").forEach((img) => {
+          if (img.complete) {
+            handleImageLoad(img);
+          } else {
+            img.addEventListener("load", () => handleImageLoad(img));
+            img.addEventListener("error", () => handleImageLoad(img));
+          }
+        });
       });
     </script>
   </body>

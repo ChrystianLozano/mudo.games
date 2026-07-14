@@ -1,0 +1,519 @@
+---
+import "../../styles/global.css";
+import { XMLParser } from "fast-xml-parser";
+import { ClientRouter } from "astro:transitions";
+
+export async function getStaticPaths() {
+  const playlistId = import.meta.env.YOUTUBE_PLAYLIST_ID ?? "PLqruPmqTbIPMyUyh_MS9FCc9lmvAGd1VA";
+  return [
+    {
+      params: { id: playlistId },
+      props: {
+        theme: "fortnite",
+        bg: "/fortnite-bg.webp",
+        description: "Explora gameplays destacados, las mejores partidas y novedades de la comunidad del Battle Royale de Epic Games.",
+        supportText: "Apóyame usando el código MUDO en la tienda #EpicPartner"
+      }
+    },
+    {
+      params: { id: "PLqruPmqTbIPOqkBTOa6rN15-kH0TufGP3" },
+      props: {
+        theme: "arc",
+        bg: "/arc-raiders-bg.webp",
+        description: "Explora la cobertura de Arc Raiders, el shooter de extracción en tercera persona.",
+        supportText: ""
+      }
+    },
+    {
+      params: { id: "PLbDsnrkbw0DY" },
+      props: {
+        theme: "detective",
+        bg: "/detective-bg.jpg",
+        description: "Aprende SQL de forma divertida resolviendo casos misteriosos con Database Detective: Minor Crimes Division.",
+        supportText: ""
+      }
+    }
+  ];
+}
+
+const { id } = Astro.params;
+const { theme, bg, description, supportText } = Astro.props;
+
+const channelName = import.meta.env.YOUTUBE_CHANNEL_NAME ?? "mudo.games";
+const feedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${id}`;
+
+let videos = [];
+let playlistTitle = "Serie Especial";
+let fetchError = "";
+
+const parser = new XMLParser({
+  ignoreAttributes: false,
+  attributeNamePrefix: "",
+  removeNSPrefix: true,
+});
+
+try {
+  const res = await fetch(feedUrl);
+  if (res.ok) {
+    const xml = await res.text();
+    const data = parser.parse(xml);
+    playlistTitle = data?.feed?.title ?? playlistTitle;
+    const entries = data?.feed?.entry ?? [];
+    const items = Array.isArray(entries) ? entries : [entries];
+
+    videos = items.map((entry) => {
+      const id = entry.videoId;
+      const title = entry.title ?? "Video";
+      const published = entry.published ?? "";
+      const description = entry?.group?.description ?? entry?.summary ?? "";
+
+      const link = Array.isArray(entry.link)
+        ? entry.link.find((l) => l.rel === "alternate")?.href
+        : entry.link?.href;
+
+      const thumbFromFeed = entry?.group?.thumbnail?.url;
+      const thumbnail =
+        thumbFromFeed ?? (id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : "");
+
+      return { id, title, published, link, thumbnail, description };
+    });
+  } else {
+    fetchError = `Respuesta ${res.status}`;
+  }
+} catch (err) {
+  fetchError = err instanceof Error ? err.message : "Error al procesar playlist";
+}
+
+const pageTitle = `${playlistTitle} - ${channelName}`;
+const siteUrl = import.meta.env.SITE ?? "https://mudo.games";
+
+const schemaMarkup = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": playlistTitle,
+  "description": description,
+  "url": `${siteUrl}/playlist/${id}`,
+  "numberOfItems": videos.length,
+  "itemListElement": videos.map((video, index) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "item": {
+      "@type": "VideoObject",
+      "name": video.title,
+      "description": video.description ? video.description.substring(0, 150) + "..." : video.title,
+      "thumbnailUrl": video.thumbnail,
+      "uploadDate": video.published ? new Date(video.published).toISOString() : new Date().toISOString(),
+      "embedUrl": `https://www.youtube.com/embed/${video.id}`,
+      "contentUrl": `https://www.youtube.com/watch?v=${video.id}`
+    }
+  }))
+};
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content={description} />
+    <meta name="robots" content="index,follow" />
+
+    <!-- Favicons -->
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/favicons/favicon-16x16.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/favicons/favicon-32x32.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="57x57"
+      href="/favicons/apple-touch-icon-57x57.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="60x60"
+      href="/favicons/apple-touch-icon-60x60.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="72x72"
+      href="/favicons/apple-touch-icon-72x72.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="76x76"
+      href="/favicons/apple-touch-icon-76x76.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="96x96"
+      href="/favicons/apple-touch-icon-96x96.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="114x114"
+      href="/favicons/apple-touch-icon-114x114.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="120x120"
+      href="/favicons/apple-touch-icon-120x120.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="144x144"
+      href="/favicons/apple-touch-icon-144x144.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="152x152"
+      href="/favicons/apple-touch-icon-152x152.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/favicons/apple-touch-icon-180x180.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="192x192"
+      href="/favicons/android-icon-192x192.png"
+    />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="msapplication-TileColor" content="#071a1c" />
+    <meta name="theme-color" content="#071a1c" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href={`${siteUrl}/playlist/${id}`} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="video.other" />
+    <meta property="og:url" content={`${siteUrl}/playlist/${id}`} />
+    <meta property="og:site_name" content={channelName} />
+    {videos[0]?.thumbnail && <meta property="og:image" content={videos[0].thumbnail} />}
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    {videos[0]?.thumbnail && <meta name="twitter:image" content={videos[0].thumbnail} />}
+
+    <title>{pageTitle}</title>
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json" set:html={JSON.stringify(schemaMarkup)} />
+
+    <ClientRouter />
+    <noscript>
+      <style>
+        .fade-in-img {
+          opacity: 1 !important;
+        }
+      </style>
+    </noscript>
+  </head>
+  <body>
+    <div class="bg">
+      <div class="glow"></div>
+      <div class="lines"></div>
+      <div class="grain"></div>
+    </div>
+
+    <main class={`playlist-detail-page is-${theme}`}>
+      <div class="playlist-detail-bg" style={`background-image: linear-gradient(180deg, rgba(7, 26, 28, 0.9) 0%, rgba(7, 26, 28, 0.4) 40%, rgba(7, 26, 28, 0.95) 100%), url('${bg}')`}></div>
+      
+      <div class="content">
+        <header class="playlist-detail-header">
+          <a href="/" class="back-link">
+            <span>←</span> Volver al inicio
+          </a>
+          <div class="section-head">
+            <span class="playlist-badge" transition:name={`playlist-badge-${id}`}>Serie Especial</span>
+            <h1 class="playlist-title" transition:name={`playlist-title-${id}`}>{playlistTitle}</h1>
+            <p class="playlist-desc">{description}</p>
+            {supportText && <p class="playlist-support" set:html={supportText}></p>}
+          </div>
+        </header>
+
+        {
+          fetchError ? (
+            <div class="error">
+              <strong>No se pudo cargar la serie.</strong>
+              <span>{fetchError}</span>
+            </div>
+          ) : (
+            <div class="grid">
+              {
+                videos.map((video) => (
+                  <article class="card playlist-card" key={video.id} style={video.thumbnail ? `--thumb-url: url('${video.thumbnail}')` : ''}>
+                    <button
+                      class="thumb js-open-modal"
+                      type="button"
+                      data-id={video.id}
+                      data-title={video.title}
+                      data-description={video.description}
+                      aria-label={`Reproducir ${video.title}`}
+                      id={`playlist-thumb-${video.id}`}
+                    >
+                      {video.thumbnail ? (
+                        <img
+                          src={video.thumbnail}
+                          alt={`Miniatura de ${video.title}`}
+                          loading="lazy"
+                          class="fade-in-img"
+                        />
+                      ) : (
+                        <div class="thumb-fallback">Sin miniatura</div>
+                      )}
+                      <span class="play">▶</span>
+                    </button>
+                    <div class="card-body">
+                      <h3>{video.title}</h3>
+                      <p class="meta">
+                        Publicado:{" "}
+                        {video.published
+                          ? new Date(video.published).toLocaleDateString("es-MX", {
+                              weekday: "long",
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            })
+                          : ""}
+                      </p>
+                      <button
+                        class="link js-open-modal"
+                        type="button"
+                        data-id={video.id}
+                        data-title={video.title}
+                        data-description={video.description}
+                        id={`playlist-link-${video.id}`}
+                      >
+                        Ver video
+                      </button>
+                    </div>
+                  </article>
+                ))
+              }
+            </div>
+          )
+        }
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p class="footer-credit">
+        Hecho con Astro + YouTube RSS - desarrollado por <a
+          href="https://chrystian.dev">Chrystian Fabian Lozano Ramirez</a
+        >
+      </p>
+      <div class="social-wrap" aria-label="Redes sociales de mudo">
+        <span class="social-title">Sígueme en</span>
+        <div class="social-links">
+          <a href="https://tiktok.com/@mudo_" target="_blank" rel="noreferrer" id="social-link-tiktok">
+            <svg
+              class="social-icon"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path
+                fill="currentColor"
+                d="M15.8 4c.2 1.3.9 2.4 1.9 3.2 1 .8 2.2 1.3 3.5 1.4v3.3c-1.7-.1-3.4-.6-4.9-1.5v5.8c0 1.5-.6 2.9-1.7 3.9a6 6 0 0 1-4.1 1.6 6 6 0 0 1-4.1-1.6 5.3 5.3 0 0 1-1.7-3.9c0-1.5.6-2.9 1.7-3.9a6 6 0 0 1 4.1-1.6c.3 0 .6 0 .9.1v3.2a2.4 2.4 0 0 0-.9-.2c-.7 0-1.2.2-1.7.7a2.2 2.2 0 0 0 0 3.3c.5.4 1 .7 1.7.7.6 0 1.2-.3 1.7-.7.4-.4.7-1 .7-1.7V4h3.2Z"
+              ></path>
+            </svg>
+            TikTok
+          </a>
+          <a href="https://twitter.com/mudo_" target="_blank" rel="noreferrer" id="social-link-twitter">
+            <svg
+              class="social-icon"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path
+                fill="currentColor"
+                d="m18.9 3h3.4l-7.4 8.4L23.6 21h-6.8L11.5 14.7 6 21H2.6l7.9-9L2 3h7l4.8 5.8L18.9 3Zm-1.2 16h1.9L7.9 4.9H5.8L17.7 19Z"
+              ></path>
+            </svg>
+            Twitter
+          </a>
+          <a
+            href="https://instagram.com/mudo_"
+            target="_blank"
+            rel="noreferrer"
+            id="social-link-instagram"
+          >
+            <svg
+              class="social-icon"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path
+                fill="currentColor"
+                d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2Zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4h-9Zm10.3 1.5a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"
+              ></path>
+            </svg>
+            Instagram
+          </a>
+        </div>
+      </div>
+    </footer>
+
+    <div class="modal" id="video-modal" aria-hidden="true">
+      <div class="modal-backdrop" data-close="true"></div>
+      <div
+        class="modal-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+      >
+        <button
+          class="modal-close"
+          type="button"
+          aria-label="Cerrar"
+          data-close="true"
+          id="modal-close-btn"
+        >
+          ✕
+        </button>
+        <div class="modal-media">
+          <iframe
+            id="modal-iframe"
+            title="Reproductor de YouTube"
+            src=""
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen></iframe>
+        </div>
+        <div class="modal-info">
+          <p class="eyebrow">Reproduciendo</p>
+          <h3 id="modal-title">Reproductor de video</h3>
+          <p id="modal-description" class="modal-desc"></p>
+          <a
+            id="modal-link"
+            class="cta modal-cta"
+            href="https://www.youtube.com"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Ver en YouTube
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script is:inline>
+      document.addEventListener('astro:page-load', () => {
+        const modal = document.querySelector("#video-modal");
+        const iframe = document.querySelector("#modal-iframe");
+        const title = document.querySelector("#modal-title");
+        const description = document.querySelector("#modal-description");
+        const link = document.querySelector("#modal-link");
+
+        if (!modal || !iframe || !title || !description || !link) return;
+
+        let viewedSet = new Set();
+
+        try {
+          const stored = JSON.parse(localStorage.getItem("viewedVideos") || "[]");
+          if (Array.isArray(stored)) viewedSet = new Set(stored);
+        } catch {
+          viewedSet = new Set();
+        }
+
+        const syncViewed = (id) => {
+          if (!id) return;
+          document.querySelectorAll(`[data-id="${id}"]`).forEach((el) => {
+            el.classList.add("is-viewed");
+          });
+        };
+
+        viewedSet.forEach((id) => syncViewed(id));
+
+        const openModal = (data) => {
+          if (!data?.id) return;
+          const url = `https://www.youtube.com/embed/${data.id}?autoplay=1&rel=0`;
+          iframe.src = url;
+          title.textContent = data.title || "Video";
+          description.textContent =
+            data.description || "Sin descripcion disponible.";
+          link.href = `https://www.youtube.com/watch?v=${data.id}`;
+          modal.setAttribute("aria-hidden", "false");
+          modal.classList.add("is-open");
+          document.body.style.overflow = "hidden";
+
+          if (!viewedSet.has(data.id)) {
+            viewedSet.add(data.id);
+            try {
+              localStorage.setItem(
+                "viewedVideos",
+                JSON.stringify([...viewedSet]),
+              );
+            } catch {}
+          }
+          syncViewed(data.id);
+        };
+
+        const closeModal = () => {
+          modal.classList.add("is-closing");
+          modal.classList.remove("is-open");
+          document.body.style.overflow = "";
+          const cleanup = () => {
+            modal.setAttribute("aria-hidden", "true");
+            modal.classList.remove("is-closing");
+            iframe.src = "";
+          };
+          setTimeout(cleanup, 260);
+        };
+
+        document.querySelectorAll(".js-open-modal").forEach((el) => {
+          el.addEventListener("click", () => {
+            openModal({
+              id: el.dataset.id,
+              title: el.dataset.title,
+              description: el.dataset.description,
+            });
+          });
+        });
+
+        // Use a new handler to avoid stacking window keydowns
+        const handleKeyDown = (event) => {
+          if (event.key === "Escape") closeModal();
+        };
+
+        modal.addEventListener("click", (event) => {
+          if (event.target?.dataset?.close === "true") closeModal();
+        });
+
+        window.removeEventListener("keydown", handleKeyDown);
+        window.addEventListener("keydown", handleKeyDown);
+
+        const handleImageLoad = (img) => {
+          img.classList.add("loaded");
+        };
+
+        document.querySelectorAll(".fade-in-img").forEach((img) => {
+          if (img.complete) {
+            handleImageLoad(img);
+          } else {
+            img.addEventListener("load", () => handleImageLoad(img));
+            img.addEventListener("error", () => handleImageLoad(img));
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
