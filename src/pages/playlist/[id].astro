@@ -252,10 +252,10 @@ const schemaMarkup = {
       <div class="playlist-detail-bg" style={`background-image: linear-gradient(180deg, rgba(7, 26, 28, 0.9) 0%, rgba(7, 26, 28, 0.4) 40%, rgba(7, 26, 28, 0.95) 100%), url('${bg}')`}></div>
       
       <div class="content">
+        <a href="/" class="back-link">
+          <span>←</span> Volver al inicio
+        </a>
         <header class="playlist-detail-header">
-          <a href="/" class="back-link">
-            <span>←</span> Volver al inicio
-          </a>
           <div class="section-head">
             <span class="playlist-badge" transition:name={`playlist-badge-${id}`}>{theme === "live" ? "En vivo" : "Serie Especial"}</span>
             <h1 class="playlist-title" transition:name={`playlist-title-${id}`}>{playlistTitle}</h1>
