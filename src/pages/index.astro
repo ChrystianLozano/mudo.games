@@ -22,6 +22,8 @@ const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId
 const playlistFeedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${playlistId}`;
 const arcPlaylistFeedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${arcPlaylistId}`;
 const detectivePlaylistFeedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${detectivePlaylistId}`;
+const livePlaylistId = `UULV${channelId.slice(2)}`;
+const livePlaylistFeedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${livePlaylistId}`;
 
 let videos = [];
 let playlistVideos = [];
@@ -30,6 +32,8 @@ let arcVideos = [];
 let arcPlaylistTitle = "Arc Raiders";
 let detectiveVideos = [];
 let detectivePlaylistTitle = "Database Detective";
+let liveVideos = [];
+let livePlaylistTitle = "Transmisiones pasadas";
 let spotlight = [];
 let shorts = [];
 let latest = null;
@@ -37,6 +41,7 @@ let fetchError = "";
 let playlistError = "";
 let arcPlaylistError = "";
 let detectivePlaylistError = "";
+let livePlaylistError = "";
 
 const parser = new XMLParser({
   ignoreAttributes: false,
@@ -76,23 +81,45 @@ function parseFeed(xml) {
   return { title, videos: parsedVideos };
 }
 
-const [channelRes, playlistRes, arcPlaylistRes, detectivePlaylistRes] = await Promise.allSettled([
+const [channelRes, playlistRes, arcPlaylistRes, detectivePlaylistRes, livePlaylistRes] = await Promise.allSettled([
   fetch(feedUrl),
   fetch(playlistFeedUrl),
   fetch(arcPlaylistFeedUrl),
   fetch(detectivePlaylistFeedUrl),
+  fetch(livePlaylistFeedUrl),
 ]);
+
+if (livePlaylistRes.status === "fulfilled" && livePlaylistRes.value.ok) {
+  try {
+    const xml = await livePlaylistRes.value.text();
+    const parsed = parseFeed(xml);
+    liveVideos = parsed.videos;
+    if (parsed.title) {
+      livePlaylistTitle = "Transmisiones pasadas";
+    }
+  } catch (err) {
+    livePlaylistError = err instanceof Error ? err.message : "Error al procesar directos";
+  }
+} else {
+  livePlaylistError = livePlaylistRes.status === "rejected" ? livePlaylistRes.reason?.message : `Respuesta ${livePlaylistRes.value?.status}`;
+}
+
+const liveVideoIds = new Set(liveVideos.map((v) => v.id));
 
 if (channelRes.status === "fulfilled" && channelRes.value.ok) {
   try {
     const xml = await channelRes.value.text();
     const parsed = parseFeed(xml);
-    videos = parsed.videos;
+    videos = parsed.videos.map((video) => ({
+      ...video,
+      isLive: liveVideoIds.has(video.id),
+    }));
     latest = videos[0] ?? null;
     const nonShorts = videos.filter((video) => !video.isShort);
-    const spotlightCandidates = latest && !latest.isShort
-      ? nonShorts.filter((video) => video.id !== latest.id)
-      : nonShorts;
+    const nonShortsNonLive = nonShorts.filter((video) => !video.isLive);
+    const spotlightCandidates = latest && !latest.isShort && !latest.isLive
+      ? nonShortsNonLive.filter((video) => video.id !== latest.id)
+      : nonShortsNonLive;
     spotlight = spotlightCandidates.slice(0, 3);
     shorts = videos.filter((video) => video.isShort).slice(0, 4);
   } catch (err) {
@@ -748,8 +775,96 @@ if (detectivePlaylistRes.status === "fulfilled" && detectivePlaylistRes.value.ok
           }
         </div>
       </section>
+      </div>
 
-      <section class="all-videos">
+      {
+        liveVideos.length > 0 && (
+          <section class="playlist-section is-live">
+            <div class="playlist-header">
+              <div class="section-head">
+                <span class="playlist-badge" transition:name={`playlist-badge-${livePlaylistId}`}>En vivo</span>
+                <h2 class="section-title playlist-title" transition:name={`playlist-title-${livePlaylistId}`}>{livePlaylistTitle}</h2>
+                <p>Revive las transmisiones en vivo y directos pasados del canal.</p>
+              </div>
+              <div class="carousel-controls">
+                <button class="carousel-btn prev-btn" aria-label="Videos anteriores" type="button">←</button>
+                <button class="carousel-btn next-btn" aria-label="Videos siguientes" type="button">→</button>
+              </div>
+            </div>
+            <div class="carousel-container">
+              <div class="carousel-track">
+                {
+                  liveVideos.slice(0, 4).map((video) => (
+                    <article class="card playlist-card carousel-slide" key={video.id} style={video.thumbnail ? `--thumb-url: url('${video.thumbnail}')` : ''}>
+                      <button
+                        class="thumb js-open-modal"
+                        type="button"
+                        data-id={video.id}
+                        data-title={video.title}
+                        data-description={video.description}
+                        aria-label={`Reproducir ${video.title}`}
+                        id={`live-thumb-${video.id}`}
+                      >
+                        {video.thumbnail ? (
+                          <img
+                            src={video.thumbnail}
+                            alt={`Miniatura de ${video.title}`}
+                            loading="lazy"
+                            class="fade-in-img"
+                          />
+                        ) : (
+                          <div class="thumb-fallback">Sin miniatura</div>
+                        )}
+                        <span class="play">▶</span>
+                      </button>
+                      <div class="card-body">
+                        <h3>{video.title}</h3>
+                        <p class="meta">
+                          Publicado:{" "}
+                          {video.published
+                            ? new Date(video.published).toLocaleDateString("es-MX", {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              })
+                            : ""}
+                        </p>
+                        <button
+                          class="link js-open-modal"
+                          type="button"
+                          data-id={video.id}
+                          data-title={video.title}
+                          data-description={video.description}
+                          id={`live-link-${video.id}`}
+                        >
+                          Ver video
+                        </button>
+                      </div>
+                    </article>
+                  ))
+                }
+                {
+                  liveVideos.length > 4 && (
+                    <article class="card playlist-card carousel-slide see-more-slide" style={liveVideos[0]?.thumbnail ? `--thumb-url: url('${liveVideos[0].thumbnail}')` : ''}>
+                      <a href={`/playlist/${livePlaylistId}`} class="see-more-link">
+                        <div class="see-more-content">
+                          <span class="icon">➜</span>
+                          <h3>Ver todos los directos</h3>
+                          <p>Ver el resto de las transmisiones</p>
+                        </div>
+                      </a>
+                    </article>
+                  )
+                }
+              </div>
+            </div>
+          </section>
+        )
+      }
+
+      <div class="content">
+        <section class="all-videos">
         <div class="section-head">
           <h2 class="section-title">Todos los últimos {videos.length}</h2>
           <p>La lista completa del feed, lista para maratonear.</p>

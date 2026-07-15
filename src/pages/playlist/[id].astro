@@ -5,7 +5,10 @@ import { ClientRouter } from "astro:transitions";
 
 export async function getStaticPaths() {
   const playlistId = import.meta.env.YOUTUBE_PLAYLIST_ID ?? "PLqruPmqTbIPMyUyh_MS9FCc9lmvAGd1VA";
-  return [
+  const channelId = import.meta.env.YOUTUBE_CHANNEL_ID;
+  const livePlaylistId = channelId ? `UULV${channelId.slice(2)}` : null;
+
+  const paths = [
     {
       params: { id: playlistId },
       props: {
@@ -34,6 +37,20 @@ export async function getStaticPaths() {
       }
     }
   ];
+
+  if (livePlaylistId) {
+    paths.push({
+      params: { id: livePlaylistId },
+      props: {
+        theme: "live",
+        bg: "",
+        description: "Revive todas las transmisiones en vivo pasadas y directos anteriores del canal.",
+        supportText: ""
+      }
+    });
+  }
+
+  return paths;
 }
 
 const { id } = Astro.params;
@@ -240,7 +257,7 @@ const schemaMarkup = {
             <span>←</span> Volver al inicio
           </a>
           <div class="section-head">
-            <span class="playlist-badge" transition:name={`playlist-badge-${id}`}>Serie Especial</span>
+            <span class="playlist-badge" transition:name={`playlist-badge-${id}`}>{theme === "live" ? "En vivo" : "Serie Especial"}</span>
             <h1 class="playlist-title" transition:name={`playlist-title-${id}`}>{playlistTitle}</h1>
             <p class="playlist-desc">{description}</p>
             {supportText && <p class="playlist-support" set:html={supportText}></p>}

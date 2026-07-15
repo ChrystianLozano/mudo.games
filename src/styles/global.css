@@ -1005,6 +1005,12 @@ body {
     url('/detective-bg.jpg');
 }
 
+.playlist-section.is-live::before {
+  background-image: 
+    linear-gradient(180deg, rgba(7, 26, 28, 0.9) 0%, rgba(15, 6, 8, 0.45) 35%, rgba(15, 6, 8, 0.5) 65%, rgba(7, 26, 28, 0.95) 100%),
+    radial-gradient(circle at 50% 50%, rgba(230, 33, 23, 0.15), transparent 70%);
+}
+
 .playlist-section.bg-fade-in::before {
   opacity: 1;
 }
@@ -1292,7 +1298,8 @@ body {
   /* Limit visible videos to 4 on mobile devices in the special playlist sections */
   .playlist-section.is-fortnite .carousel-slide:nth-child(n+5):not(.see-more-slide),
   .playlist-section.is-arc .carousel-slide:nth-child(n+5):not(.see-more-slide),
-  .playlist-section.is-detective .carousel-slide:nth-child(n+5):not(.see-more-slide) {
+  .playlist-section.is-detective .carousel-slide:nth-child(n+5):not(.see-more-slide),
+  .playlist-section.is-live .carousel-slide:nth-child(n+5):not(.see-more-slide) {
     display: none !important;
   }
 
@@ -1615,6 +1622,12 @@ body {
 .playlist-detail-page .grid .card:nth-child(8) { animation-delay: 0.32s; }
 .playlist-detail-page .grid .card:nth-child(9) { animation-delay: 0.36s; }
 .playlist-detail-page .grid .card:nth-child(n+10) { animation-delay: 0.40s; }
+
+.playlist-detail-page.is-live .playlist-detail-bg {
+  background-image: 
+    linear-gradient(180deg, rgba(7, 26, 28, 0.9) 0%, rgba(15, 6, 8, 0.45) 40%, rgba(7, 26, 28, 0.95) 100%),
+    radial-gradient(circle at 50% 50%, rgba(230, 33, 23, 0.18), transparent 70%) !important;
+}
 
 
 
