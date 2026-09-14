@@ -12,6 +12,7 @@ export async function getStaticPaths() {
     {
       params: { id: playlistId },
       props: {
+        title: "Fortnite",
         theme: "fortnite",
         bg: "/fortnite-bg.webp",
         description: "Explora gameplays destacados, las mejores partidas y novedades de la comunidad del Battle Royale de Epic Games.",
@@ -21,6 +22,7 @@ export async function getStaticPaths() {
     {
       params: { id: "PLqruPmqTbIPOqkBTOa6rN15-kH0TufGP3" },
       props: {
+        title: "Arc Raiders",
         theme: "arc",
         bg: "/arc-raiders-bg.webp",
         description: "Explora la cobertura de Arc Raiders, el shooter de extracción en tercera persona.",
@@ -30,9 +32,20 @@ export async function getStaticPaths() {
     {
       params: { id: "PLbDsnrkbw0DY" },
       props: {
+        title: "Database Detective",
         theme: "detective",
         bg: "/detective-bg.jpg",
         description: "Aprende SQL de forma divertida resolviendo casos misteriosos con Database Detective: Minor Crimes Division.",
+        supportText: ""
+      }
+    },
+    {
+      params: { id: "PLqruPmqTbIPMTHYmt0tiZuKuSlowh08E8" },
+      props: {
+        title: "Tomodachi Life™: Living the Dream",
+        theme: "tomodachi",
+        bg: "/tomodachi-bg.jpg",
+        description: "Acompaña a mudo en Tomodachi Life™: Living the Dream y descubre la caótica y divertida vida de los residentes en la Isla Jochis.",
         supportText: ""
       }
     }
@@ -42,6 +55,7 @@ export async function getStaticPaths() {
     paths.push({
       params: { id: livePlaylistId },
       props: {
+        title: "Transmisiones pasadas",
         theme: "live",
         bg: "",
         description: "Revive todas las transmisiones en vivo pasadas y directos anteriores del canal.",
@@ -54,13 +68,13 @@ export async function getStaticPaths() {
 }
 
 const { id } = Astro.params;
-const { theme, bg, description, supportText } = Astro.props;
+const { title, theme, bg, description, supportText } = Astro.props;
 
 const channelName = import.meta.env.YOUTUBE_CHANNEL_NAME ?? "mudo.games";
 const feedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${id}`;
 
 let videos = [];
-let playlistTitle = "Serie Especial";
+let playlistTitle = title ?? "Serie Especial";
 let fetchError = "";
 
 const parser = new XMLParser({
