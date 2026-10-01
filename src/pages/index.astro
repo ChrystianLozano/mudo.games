@@ -410,74 +410,78 @@ const schemaMarkup = {
 
       </div>
 
-      <section class="playlist-section is-spotlight">
-        <div class="playlist-header">
-          <div class="section-head">
-            <span class="playlist-badge">Destacados</span>
-            <h2 class="section-title playlist-title">Spotlight</h2>
-            <p>Los tres lanzamientos más frescos listos para reproducirse.</p>
-          </div>
-          <div class="carousel-controls">
-            <button class="carousel-btn prev-btn" aria-label="Videos anteriores" type="button">←</button>
-            <button class="carousel-btn next-btn" aria-label="Videos siguientes" type="button">→</button>
-          </div>
-        </div>
-        <div class="carousel-container">
-          <div class="carousel-track">
-            {
-              spotlight.map((video) => (
-                <article class="card playlist-card carousel-slide" key={video.id} style={video.thumbnail ? `--thumb-url: url('${video.thumbnail}')` : ''}>
-                  <button
-                    class="thumb js-open-modal"
-                    type="button"
-                    data-id={video.id}
-                    data-title={video.title}
-                    data-description={video.description}
-                    aria-label={`Reproducir ${video.title}`}
-                    id={`spotlight-thumb-${video.id}`}
-                  >
-                    {video.thumbnail ? (
-                      <img
-                        src={video.thumbnail}
-                        alt={`Miniatura de ${video.title}`}
-                        loading="lazy"
-                        class="fade-in-img"
-                      />
-                    ) : (
-                      <div class="thumb-fallback">Sin miniatura</div>
-                    )}
-                    <span class="play">▶</span>
-                  </button>
-                  <div class="card-body">
-                    <h3>{video.title}</h3>
-                    <p class="meta">
-                      Publicado:{" "}
-                      {video.published
-                        ? new Date(video.published).toLocaleDateString("es-MX", {
-                            weekday: "long",
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          })
-                        : ""}
-                    </p>
-                    <button
-                      class="link js-open-modal"
-                      type="button"
-                      data-id={video.id}
-                      data-title={video.title}
-                      data-description={video.description}
-                      id={`spotlight-link-${video.id}`}
-                    >
-                      Ver video
-                    </button>
-                  </div>
-                </article>
-              ))
-            }
-          </div>
-        </div>
-      </section>
+      {
+        spotlight.length > 0 && (
+          <section class="playlist-section is-spotlight">
+            <div class="playlist-header">
+              <div class="section-head">
+                <span class="playlist-badge">Destacados</span>
+                <h2 class="section-title playlist-title">Spotlight</h2>
+                <p>Los tres lanzamientos más frescos listos para reproducirse.</p>
+              </div>
+              <div class="carousel-controls">
+                <button class="carousel-btn prev-btn" aria-label="Videos anteriores" type="button">←</button>
+                <button class="carousel-btn next-btn" aria-label="Videos siguientes" type="button">→</button>
+              </div>
+            </div>
+            <div class="carousel-container">
+              <div class="carousel-track">
+                {
+                  spotlight.map((video) => (
+                    <article class="card playlist-card carousel-slide" key={video.id} style={video.thumbnail ? `--thumb-url: url('${video.thumbnail}')` : ''}>
+                      <button
+                        class="thumb js-open-modal"
+                        type="button"
+                        data-id={video.id}
+                        data-title={video.title}
+                        data-description={video.description}
+                        aria-label={`Reproducir ${video.title}`}
+                        id={`spotlight-thumb-${video.id}`}
+                      >
+                        {video.thumbnail ? (
+                          <img
+                            src={video.thumbnail}
+                            alt={`Miniatura de ${video.title}`}
+                            loading="lazy"
+                            class="fade-in-img"
+                          />
+                        ) : (
+                          <div class="thumb-fallback">Sin miniatura</div>
+                        )}
+                        <span class="play">▶</span>
+                      </button>
+                      <div class="card-body">
+                        <h3>{video.title}</h3>
+                        <p class="meta">
+                          Publicado:{" "}
+                          {video.published
+                            ? new Date(video.published).toLocaleDateString("es-MX", {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              })
+                            : ""}
+                        </p>
+                        <button
+                          class="link js-open-modal"
+                          type="button"
+                          data-id={video.id}
+                          data-title={video.title}
+                          data-description={video.description}
+                          id={`spotlight-link-${video.id}`}
+                        >
+                          Ver video
+                        </button>
+                      </div>
+                    </article>
+                  ))
+                }
+              </div>
+            </div>
+          </section>
+        )
+      }
 
       {
         playlistVideos.length > 0 && (
