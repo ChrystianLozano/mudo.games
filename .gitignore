@@ -5,3 +5,5 @@ node_modules
 .env
 .DS_Store
 GEMINI.md
+.agents
+.skills.json

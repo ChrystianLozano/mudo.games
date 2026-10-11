@@ -1,18 +1,14 @@
 ---
 import "../styles/global.css";
-import { XMLParser } from "fast-xml-parser";
 import { ClientRouter } from "astro:transitions";
+import { fetchFeed } from "../utils/youtube.js";
 
-const channelId = import.meta.env.YOUTUBE_CHANNEL_ID;
+const channelId = import.meta.env.YOUTUBE_CHANNEL_ID ?? "UCAujaqB89ZgrM-l6r2Zqqrg";
 const channelName = import.meta.env.YOUTUBE_CHANNEL_NAME ?? "mudo.games";
 const siteUrl = import.meta.env.SITE ?? "https://mudo.games";
 const pageTitle = `Últimos videos de ${channelName}`;
 const pageDescription =
   "Explora los últimos videos, shorts y destacados de mudo.games con miniaturas, timeline y reproducción directa. Contacto: hola@mudo.games.";
-
-if (!channelId) {
-  throw new Error("Falta YOUTUBE_CHANNEL_ID en el entorno (.env)");
-}
 
 const playlistId = import.meta.env.YOUTUBE_PLAYLIST_ID ?? "PLqruPmqTbIPMyUyh_MS9FCc9lmvAGd1VA";
 const arcPlaylistId = "PLqruPmqTbIPOqkBTOa6rN15-kH0TufGP3";
@@ -25,154 +21,42 @@ const detectivePlaylistFeedUrl = `https://www.youtube.com/feeds/videos.xml?playl
 const livePlaylistId = `UULV${channelId.slice(2)}`;
 const livePlaylistFeedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${livePlaylistId}`;
 
-let videos = [];
-let playlistVideos = [];
-let playlistTitle = "Serie Especial";
-let arcVideos = [];
-let arcPlaylistTitle = "Arc Raiders";
-let detectiveVideos = [];
-let detectivePlaylistTitle = "Database Detective";
-let liveVideos = [];
-let livePlaylistTitle = "Transmisiones pasadas";
-let spotlight = [];
-let shorts = [];
-let latest = null;
-let fetchError = "";
-let playlistError = "";
-let arcPlaylistError = "";
-let detectivePlaylistError = "";
-let livePlaylistError = "";
-
-const parser = new XMLParser({
-  ignoreAttributes: false,
-  attributeNamePrefix: "",
-  removeNSPrefix: true,
-});
-
-function parseFeed(xml) {
-  const data = parser.parse(xml);
-  const title = data?.feed?.title ?? "";
-  const entries = data?.feed?.entry ?? [];
-  const items = Array.isArray(entries) ? entries : [entries];
-
-  const parsedVideos = items.map((entry) => {
-    const id = entry.videoId;
-    const title = entry.title ?? "Video";
-    const published = entry.published ?? "";
-    const description = entry?.group?.description ?? entry?.summary ?? "";
-
-    const link = Array.isArray(entry.link)
-      ? entry.link.find((l) => l.rel === "alternate")?.href
-      : entry.link?.href;
-
-    const thumbFromFeed = entry?.group?.thumbnail?.url;
-    const thumbnail =
-      thumbFromFeed ?? (id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : "");
-
-    const lowerTitle = title.toLowerCase();
-    const isShort =
-      (typeof link === "string" && link.includes("/shorts/")) ||
-      lowerTitle.includes("#shorts") ||
-      lowerTitle.includes("short");
-
-    return { id, title, published, link, thumbnail, isShort, description };
-  });
-
-  return { title, videos: parsedVideos };
-}
-
-const [channelRes, playlistRes, arcPlaylistRes, detectivePlaylistRes, livePlaylistRes] = await Promise.allSettled([
-  fetch(feedUrl),
-  fetch(playlistFeedUrl),
-  fetch(arcPlaylistFeedUrl),
-  fetch(detectivePlaylistFeedUrl),
-  fetch(livePlaylistFeedUrl),
+const [channelData, playlistData, arcPlaylistData, detectivePlaylistData, livePlaylistData] = await Promise.all([
+  fetchFeed({ url: feedUrl, type: "channel" }),
+  fetchFeed({ url: playlistFeedUrl, type: "playlist", playlistId, fallbackTitle: "Serie Especial" }),
+  fetchFeed({ url: arcPlaylistFeedUrl, type: "playlist", playlistId: arcPlaylistId, fallbackTitle: "Arc Raiders" }),
+  fetchFeed({ url: detectivePlaylistFeedUrl, type: "playlist", playlistId: detectivePlaylistId, fallbackTitle: "Database Detective" }),
+  fetchFeed({ url: livePlaylistFeedUrl, type: "playlist", playlistId: livePlaylistId, fallbackTitle: "Transmisiones pasadas" }),
 ]);
 
-if (livePlaylistRes.status === "fulfilled" && livePlaylistRes.value.ok) {
-  try {
-    const xml = await livePlaylistRes.value.text();
-    const parsed = parseFeed(xml);
-    liveVideos = parsed.videos;
-    if (parsed.title) {
-      livePlaylistTitle = "Transmisiones pasadas";
-    }
-  } catch (err) {
-    livePlaylistError = err instanceof Error ? err.message : "Error al procesar directos";
-  }
-} else {
-  livePlaylistError = livePlaylistRes.status === "rejected" ? livePlaylistRes.reason?.message : `Respuesta ${livePlaylistRes.value?.status}`;
-}
-
+const liveVideos = livePlaylistData.videos;
+const livePlaylistTitle = livePlaylistData.title || "Transmisiones pasadas";
 const liveVideoIds = new Set(liveVideos.map((v) => v.id));
 
-if (channelRes.status === "fulfilled" && channelRes.value.ok) {
-  try {
-    const xml = await channelRes.value.text();
-    const parsed = parseFeed(xml);
-    videos = parsed.videos.map((video) => ({
-      ...video,
-      isLive: liveVideoIds.has(video.id),
-    }));
-    latest = videos[0] ?? null;
-    const nonShorts = videos.filter((video) => !video.isShort);
-    const nonShortsNonLive = nonShorts.filter((video) => !video.isLive);
-    const spotlightCandidates = latest && !latest.isShort && !latest.isLive
-      ? nonShortsNonLive.filter((video) => video.id !== latest.id)
-      : nonShortsNonLive;
-    spotlight = spotlightCandidates.slice(0, 3);
-    shorts = videos.filter((video) => video.isShort).slice(0, 4);
-  } catch (err) {
-    fetchError = err instanceof Error ? err.message : "Error al procesar canal";
-  }
-} else {
-  fetchError = channelRes.status === "rejected" ? channelRes.reason?.message : `Respuesta ${channelRes.value?.status}`;
-}
+const playlistVideos = playlistData.videos;
+const playlistTitle = playlistData.title || "Serie Especial";
 
-if (playlistRes.status === "fulfilled" && playlistRes.value.ok) {
-  try {
-    const xml = await playlistRes.value.text();
-    const parsed = parseFeed(xml);
-    playlistVideos = parsed.videos;
-    if (parsed.title) {
-      playlistTitle = parsed.title;
-    }
-  } catch (err) {
-    playlistError = err instanceof Error ? err.message : "Error al procesar playlist";
-  }
-} else {
-  playlistError = playlistRes.status === "rejected" ? playlistRes.reason?.message : `Respuesta ${playlistRes.value?.status}`;
-}
+const arcVideos = arcPlaylistData.videos;
+const arcPlaylistTitle = arcPlaylistData.title || "Arc Raiders";
 
-if (arcPlaylistRes.status === "fulfilled" && arcPlaylistRes.value.ok) {
-  try {
-    const xml = await arcPlaylistRes.value.text();
-    const parsed = parseFeed(xml);
-    arcVideos = parsed.videos;
-    if (parsed.title) {
-      arcPlaylistTitle = parsed.title;
-    }
-  } catch (err) {
-    arcPlaylistError = err instanceof Error ? err.message : "Error al procesar playlist de Arc Raiders";
-  }
-} else {
-  arcPlaylistError = arcPlaylistRes.status === "rejected" ? arcPlaylistRes.reason?.message : `Respuesta ${arcPlaylistRes.value?.status}`;
-}
+const detectiveVideos = detectivePlaylistData.videos;
+const detectivePlaylistTitle = detectivePlaylistData.title || "Database Detective";
 
-if (detectivePlaylistRes.status === "fulfilled" && detectivePlaylistRes.value.ok) {
-  try {
-    const xml = await detectivePlaylistRes.value.text();
-    const parsed = parseFeed(xml);
-    detectiveVideos = parsed.videos;
-    if (parsed.title) {
-      detectivePlaylistTitle = parsed.title;
-    }
-  } catch (err) {
-    detectivePlaylistError = err instanceof Error ? err.message : "Error al procesar playlist de Database Detective";
-  }
-} else {
-  detectivePlaylistError = detectivePlaylistRes.status === "rejected" ? detectivePlaylistRes.reason?.message : `Respuesta ${detectivePlaylistRes.value?.status}`;
-}
+const fetchError = channelData.error;
+
+const videos = channelData.videos.map((video) => ({
+  ...video,
+  isLive: liveVideoIds.has(video.id),
+}));
+
+const latest = videos[0] ?? null;
+const nonShorts = videos.filter((video) => !video.isShort);
+const nonShortsNonLive = nonShorts.filter((video) => !video.isLive);
+const spotlightCandidates = latest && !latest.isShort && !latest.isLive
+  ? nonShortsNonLive.filter((video) => video.id !== latest.id)
+  : nonShortsNonLive;
+const spotlight = spotlightCandidates.slice(0, 3);
+const shorts = videos.filter((video) => video.isShort).slice(0, 4);
 
 const ogImageUrl = `${siteUrl}/og-image.jpg`;
 

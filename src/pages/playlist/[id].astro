@@ -1,12 +1,12 @@
 ---
 import "../../styles/global.css";
-import { XMLParser } from "fast-xml-parser";
 import { ClientRouter } from "astro:transitions";
+import { fetchFeed } from "../../utils/youtube.js";
 
 export async function getStaticPaths() {
   const playlistId = import.meta.env.YOUTUBE_PLAYLIST_ID ?? "PLqruPmqTbIPMyUyh_MS9FCc9lmvAGd1VA";
-  const channelId = import.meta.env.YOUTUBE_CHANNEL_ID;
-  const livePlaylistId = channelId ? `UULV${channelId.slice(2)}` : null;
+  const channelId = import.meta.env.YOUTUBE_CHANNEL_ID ?? "UCAujaqB89ZgrM-l6r2Zqqrg";
+  const livePlaylistId = `UULV${channelId.slice(2)}`;
 
   const paths = [
     {
@@ -73,47 +73,16 @@ const { title, theme, bg, description, supportText } = Astro.props;
 const channelName = import.meta.env.YOUTUBE_CHANNEL_NAME ?? "mudo.games";
 const feedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${id}`;
 
-let videos = [];
-let playlistTitle = title ?? "Serie Especial";
-let fetchError = "";
-
-const parser = new XMLParser({
-  ignoreAttributes: false,
-  attributeNamePrefix: "",
-  removeNSPrefix: true,
+const playlistData = await fetchFeed({
+  url: feedUrl,
+  type: "playlist",
+  playlistId: id,
+  fallbackTitle: title ?? "Serie Especial",
 });
 
-try {
-  const res = await fetch(feedUrl);
-  if (res.ok) {
-    const xml = await res.text();
-    const data = parser.parse(xml);
-    playlistTitle = data?.feed?.title ?? playlistTitle;
-    const entries = data?.feed?.entry ?? [];
-    const items = Array.isArray(entries) ? entries : [entries];
-
-    videos = items.map((entry) => {
-      const id = entry.videoId;
-      const title = entry.title ?? "Video";
-      const published = entry.published ?? "";
-      const description = entry?.group?.description ?? entry?.summary ?? "";
-
-      const link = Array.isArray(entry.link)
-        ? entry.link.find((l) => l.rel === "alternate")?.href
-        : entry.link?.href;
-
-      const thumbFromFeed = entry?.group?.thumbnail?.url;
-      const thumbnail =
-        thumbFromFeed ?? (id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : "");
-
-      return { id, title, published, link, thumbnail, description };
-    });
-  } else {
-    fetchError = `Respuesta ${res.status}`;
-  }
-} catch (err) {
-  fetchError = err instanceof Error ? err.message : "Error al procesar playlist";
-}
+const videos = playlistData.videos;
+const playlistTitle = playlistData.title || title || "Serie Especial";
+const fetchError = playlistData.error;
 
 const pageTitle = `${playlistTitle} - ${channelName}`;
 const siteUrl = import.meta.env.SITE ?? "https://mudo.games";
