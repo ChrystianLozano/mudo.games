@@ -57,11 +57,24 @@ let currentCache = {
   playlists: fallbackCache.playlists ?? {},
 };
 
+let lastPersistedSnapshot = JSON.stringify({
+  channel: currentCache.channel,
+  playlists: currentCache.playlists,
+});
+
 export function getCache() {
   return currentCache;
 }
 
 export function saveCacheToDisk() {
+  const nextSnapshot = JSON.stringify({
+    channel: currentCache.channel,
+    playlists: currentCache.playlists,
+  });
+  if (nextSnapshot === lastPersistedSnapshot) {
+    return;
+  }
+  lastPersistedSnapshot = nextSnapshot;
   currentCache.updatedAt = new Date().toISOString();
   try {
     const filePath = path.resolve(process.cwd(), "src/data/youtube-cache.json");

@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -19,6 +19,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      should_deploy: ${{ steps.build.outputs.should_deploy }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -26,13 +28,34 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run build
+      - name: Build site
+        id: build
+        run: |
+          set -o pipefail
+          npm run build | tee build.log
+          if [ "${{ github.event_name }}" = "schedule" ] && grep -q "\[YouTube RSS\] Feed no disponible.*channel_id=" build.log; then
+            echo "should_deploy=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping deploy on scheduled run because channel RSS failed."
+          else
+            echo "should_deploy=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Commit updated YouTube cache
+        run: |
+          if ! git diff --quiet src/data/youtube-cache.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add src/data/youtube-cache.json
+            git commit -m "chore(cache): update youtube-cache.json [skip ci]"
+            git push
+          fi
       - uses: actions/upload-pages-artifact@v3
+        if: steps.build.outputs.should_deploy == 'true'
         with:
           path: ./dist
 
   deploy:
     needs: build
+    if: needs.build.outputs.should_deploy == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
