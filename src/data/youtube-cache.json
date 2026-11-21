@@ -1,16 +1,25 @@
 {
-  "updatedAt": "2026-11-20T01:41:44.701Z",
+  "updatedAt": "2026-11-21T01:11:23.233Z",
   "channel": {
     "title": "MudoGames",
     "videos": [
       {
-        "id": "R_vj-nq22-I",
-        "title": "paseando en una baika en GTA VI [GAMEPLAY] [SIN COMENTARIOS]",
-        "published": "2026-11-19T18:22:37+00:00",
-        "link": "https://www.youtube.com/watch?v=R_vj-nq22-I",
-        "thumbnail": "https://i3.ytimg.com/vi/R_vj-nq22-I/hqdefault.jpg",
+        "id": "IsVZii_fqMk",
+        "title": "¡Oye, Arnold! GTA VI [GAMEPLAY] [HISTORIA]",
+        "published": "2026-11-20T20:00:11+00:00",
+        "link": "https://www.youtube.com/watch?v=IsVZii_fqMk",
+        "thumbnail": "https://i2.ytimg.com/vi/IsVZii_fqMk/hqdefault.jpg",
         "isShort": false,
-        "description": "Stream/Video Overlay Designer: @mudo_\nThumbnail Designer: @mudo_\nEditor: @mudo_"
+        "description": "Acompaña a Jason Duval en la misión principal \"¡Hey, Arnold!\" de Grand Theft Auto VI, donde las cosas se calientan cuando Arnold desaparece sin avisar y deja a Brian buscando respuestas.\nEntre recorridos por el causeway, tensiones por territorio y cargamentos, y el choque de intereses en el bajo mundo de Leonida, esta misión muestra el lado más crudo y directo de los encargos de Jason antes de cruzar camino con nuevos rostros\n\n#GTAVI #GTA6 #GrandTheftAutoVI #HeyArnold #JasonDuval #Leonida #HistoriaGTAVI #GameplayGTA6 #rockstargames \n\nStream/Video Overlay Designer: @mudo_\nThumbnail Designer: @mudo_\nEditor: @mudo_"
+      },
+      {
+        "id": "M-Amms-BOnk",
+        "title": "GTA 6 - Primeras Horas de Gameplay [GAMEPLAY] [SIN COMENTARIOS]",
+        "published": "2026-11-20T02:36:25+00:00",
+        "link": "https://www.youtube.com/watch?v=M-Amms-BOnk",
+        "thumbnail": "https://i2.ytimg.com/vi/M-Amms-BOnk/hqdefault.jpg",
+        "isShort": false,
+        "description": "Vive las primeras horas de Grand Theft Auto VI en PlayStation 5 con este gameplay puro, sin comentarios ni interrupciones, para que disfrutes el inicio de la historia, la ambientación y el mundo abierto tal como son.\nAcompaña a Jason Duval y Lucia Caminos en sus primeros pasos por el estado de Leonida, recorriendo escenarios inspirados en Florida como Vice City, los Cayos y más, en el arranque de la nueva entrega de Rockstar Games.\n\n#GTAVI #GTA6 #GrandTheftAutoVI #PS5 #GameplaySinComentarios #ViceCity #Leonida #RockstarGames #MudoGames\n\nStream/Video Overlay Designer: @mudo_\nThumbnail Designer: @mudo_\nEditor: @mudo_"
       },
       {
         "id": "FYVZbfMHYWI",
@@ -128,15 +137,6 @@
         "thumbnail": "https://i3.ytimg.com/vi/BucfkpRa5ss/hqdefault.jpg",
         "isShort": false,
         "description": "Stream/Video Overlay Designer: @mudo_\nThumbnail Designer: @mudo_\nEditor: @mudo_"
-      },
-      {
-        "id": "d4mg3EBQeRE",
-        "title": "Gran Árbol Deku - Zelda Ocarina of Time - Español Latino [GAMEPLAY] [SIN COMENTARIOS]",
-        "published": "2026-11-10T23:00:26+00:00",
-        "link": "https://www.youtube.com/watch?v=d4mg3EBQeRE",
-        "thumbnail": "https://i1.ytimg.com/vi/d4mg3EBQeRE/hqdefault.jpg",
-        "isShort": false,
-        "description": "Adéntrate en las raíces del imponente Gran Árbol Deku en esta sesión de puro gameplay de The Legend of Zelda: Ocarina of Time Remaster para Nintendo Switch 2. En este recorrido inmersivo y sin comentarios, completamos la icónica primera mazmorra del juego al 100%. Descubre cómo lucen los rediseñados puzles, la impresionante iluminación filtrándose por las ramas y el épico enfrentamiento contra la temible reina arácnida, Gohma. Todo capturado para que disfrutes de la atmósfera, las físicas mejoradas y los renovados sonidos del entorno sin ninguna distracción.\nNo olvides suscribirte a Mudo Games y dejar tu like si disfrutas de estas aventuras de Hyrule en su estado más puro. ¡Déjame en los comentarios qué te pareció el nuevo nivel de detalle de esta mítica mazmorra!\n\n#GranArbolDeku #ZeldaOcarinaOfTime #NintendoSwitch2 #OcarinaOfTimeRemaster #NoCommentary #MudoGames #ZeldaGameplay #Gohma #LaLeyendaRenace\n\nStream/Video Overlay Designer: @mudo_\nThumbnail Designer: @mudo_\nEditor: @mudo_"
       }
     ]
   },
@@ -606,15 +606,6 @@
       "title": "Live streams",
       "videos": [
         {
-          "id": "R_vj-nq22-I",
-          "title": "paseando en una baika en GTA VI [GAMEPLAY] [SIN COMENTARIOS]",
-          "published": "2026-11-19T18:22:37+00:00",
-          "link": "https://www.youtube.com/watch?v=R_vj-nq22-I",
-          "thumbnail": "https://i3.ytimg.com/vi/R_vj-nq22-I/hqdefault.jpg",
-          "isShort": false,
-          "description": "Stream/Video Overlay Designer: @mudo_\nThumbnail Designer: @mudo_\nEditor: @mudo_"
-        },
-        {
           "id": "FYVZbfMHYWI",
           "title": "En un crater caluroso  Ocarina of Time en Español Latino [GAMEPLAY] [SIN COMENTARIOS]",
           "published": "2026-11-19T05:52:33+00:00",
@@ -737,6 +728,15 @@
           "published": "2026-10-15T07:36:06+00:00",
           "link": "https://www.youtube.com/watch?v=Uaa4HylEjSI",
           "thumbnail": "https://i2.ytimg.com/vi/Uaa4HylEjSI/hqdefault.jpg",
+          "isShort": false,
+          "description": "de chill"
+        },
+        {
+          "id": "27qWqXOZ3Nk",
+          "title": "Probando el Beta de PVE en Arc Raiders",
+          "published": "2026-10-14T06:32:19+00:00",
+          "link": "https://www.youtube.com/watch?v=27qWqXOZ3Nk",
+          "thumbnail": "https://i3.ytimg.com/vi/27qWqXOZ3Nk/hqdefault.jpg",
           "isShort": false,
           "description": "de chill"
         }
