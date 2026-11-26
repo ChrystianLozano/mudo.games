@@ -1009,6 +1009,12 @@ body {
     url('/detective-bg.jpg');
 }
 
+.playlist-section.is-zelda::before {
+  background-image: 
+    linear-gradient(180deg, rgba(7, 26, 28, 0.9) 0%, rgba(7, 26, 28, 0.35) 35%, rgba(7, 26, 28, 0.4) 65%, rgba(7, 26, 28, 0.95) 100%),
+    url('/zelda-bg.jpg');
+}
+
 .playlist-section.is-live::before {
   background-image: 
     linear-gradient(180deg, rgba(7, 26, 28, 0.9) 0%, rgba(15, 6, 8, 0.45) 35%, rgba(15, 6, 8, 0.5) 65%, rgba(7, 26, 28, 0.95) 100%),
@@ -1285,7 +1291,8 @@ body {
     background-position: center !important; /* Center the lockers on mobile */
   }
 
-  .playlist-section.is-detective::before {
+  .playlist-section.is-detective::before,
+  .playlist-section.is-zelda::before {
     background-position: center !important;
   }
 
@@ -1308,6 +1315,7 @@ body {
   .playlist-section.is-fortnite .carousel-slide:nth-child(n+5):not(.see-more-slide),
   .playlist-section.is-arc .carousel-slide:nth-child(n+5):not(.see-more-slide),
   .playlist-section.is-detective .carousel-slide:nth-child(n+5):not(.see-more-slide),
+  .playlist-section.is-zelda .carousel-slide:nth-child(n+5):not(.see-more-slide),
   .playlist-section.is-live .carousel-slide:nth-child(n+5):not(.see-more-slide) {
     display: none !important;
   }

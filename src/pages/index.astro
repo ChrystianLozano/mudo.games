@@ -12,20 +12,20 @@ const pageDescription =
 
 const playlistId = import.meta.env.YOUTUBE_PLAYLIST_ID ?? "PLqruPmqTbIPMyUyh_MS9FCc9lmvAGd1VA";
 const arcPlaylistId = "PLqruPmqTbIPOqkBTOa6rN15-kH0TufGP3";
-const detectivePlaylistId = "PLbDsnrkbw0DY";
+const zeldaPlaylistId = "PLDZsct2vGyw0";
 
 const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
 const playlistFeedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${playlistId}`;
 const arcPlaylistFeedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${arcPlaylistId}`;
-const detectivePlaylistFeedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${detectivePlaylistId}`;
+const zeldaPlaylistFeedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${zeldaPlaylistId}`;
 const livePlaylistId = `UULV${channelId.slice(2)}`;
 const livePlaylistFeedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${livePlaylistId}`;
 
-const [channelData, playlistData, arcPlaylistData, detectivePlaylistData, livePlaylistData] = await Promise.all([
+const [channelData, playlistData, arcPlaylistData, zeldaPlaylistData, livePlaylistData] = await Promise.all([
   fetchFeed({ url: feedUrl, type: "channel" }),
   fetchFeed({ url: playlistFeedUrl, type: "playlist", playlistId, fallbackTitle: "Serie Especial" }),
   fetchFeed({ url: arcPlaylistFeedUrl, type: "playlist", playlistId: arcPlaylistId, fallbackTitle: "Arc Raiders" }),
-  fetchFeed({ url: detectivePlaylistFeedUrl, type: "playlist", playlistId: detectivePlaylistId, fallbackTitle: "Database Detective" }),
+  fetchFeed({ url: zeldaPlaylistFeedUrl, type: "playlist", playlistId: zeldaPlaylistId, fallbackTitle: "The Legend of Zelda: Ocarina of Time Remake - Español Latino" }),
   fetchFeed({ url: livePlaylistFeedUrl, type: "playlist", playlistId: livePlaylistId, fallbackTitle: "Transmisiones pasadas" }),
 ]);
 
@@ -39,8 +39,8 @@ const playlistTitle = playlistData.title || "Serie Especial";
 const arcVideos = arcPlaylistData.videos;
 const arcPlaylistTitle = arcPlaylistData.title || "Arc Raiders";
 
-const detectiveVideos = detectivePlaylistData.videos;
-const detectivePlaylistTitle = detectivePlaylistData.title || "Database Detective";
+const zeldaVideos = zeldaPlaylistData.videos;
+const zeldaPlaylistTitle = zeldaPlaylistData.title || "The Legend of Zelda: Ocarina of Time Remake - Español Latino";
 
 const fetchError = channelData.error;
 
@@ -541,13 +541,13 @@ const schemaMarkup = {
       }
 
       {
-        detectiveVideos.length > 0 && (
-          <section class="playlist-section is-detective">
+        zeldaVideos.length > 0 && (
+          <section class="playlist-section is-zelda">
             <div class="playlist-header">
               <div class="section-head">
-                <span class="playlist-badge" transition:name={`playlist-badge-${detectivePlaylistId}`}>Serie Especial</span>
-                <h2 class="section-title playlist-title" transition:name={`playlist-title-${detectivePlaylistId}`}>{detectivePlaylistTitle}</h2>
-                <p>Aprende SQL de forma divertida resolviendo casos misteriosos con Database Detective: Minor Crimes Division.</p>
+                <span class="playlist-badge" transition:name={`playlist-badge-${zeldaPlaylistId}`}>Serie Especial</span>
+                <h2 class="section-title playlist-title" transition:name={`playlist-title-${zeldaPlaylistId}`}>{zeldaPlaylistTitle}</h2>
+                <p>Revive la legendaria aventura en Hyrule con gameplays inmersivos de The Legend of Zelda: Ocarina of Time en Español Latino.</p>
               </div>
               <div class="carousel-controls">
                 <button class="carousel-btn prev-btn" aria-label="Videos anteriores" type="button">←</button>
@@ -557,7 +557,7 @@ const schemaMarkup = {
             <div class="carousel-container">
               <div class="carousel-track">
                 {
-                  detectiveVideos.slice(0, 4).map((video) => (
+                  zeldaVideos.slice(0, 4).map((video) => (
                     <article class="card playlist-card carousel-slide" key={video.id} style={video.thumbnail ? `--thumb-url: url('${video.thumbnail}')` : ''}>
                       <button
                         class="thumb js-open-modal"
@@ -566,7 +566,7 @@ const schemaMarkup = {
                         data-title={video.title}
                         data-description={video.description}
                         aria-label={`Reproducir ${video.title}`}
-                        id={`detective-thumb-${video.id}`}
+                        id={`zelda-thumb-${video.id}`}
                       >
                         {video.thumbnail ? (
                           <img
@@ -599,7 +599,7 @@ const schemaMarkup = {
                           data-id={video.id}
                           data-title={video.title}
                           data-description={video.description}
-                          id={`detective-link-${video.id}`}
+                          id={`zelda-link-${video.id}`}
                         >
                           Ver video
                         </button>
@@ -608,9 +608,9 @@ const schemaMarkup = {
                   ))
                 }
                 {
-                  detectiveVideos.length > 4 && (
-                    <article class="card playlist-card carousel-slide see-more-slide" style="--thumb-url: url('/detective-bg.jpg')">
-                      <a href={`/playlist/${detectivePlaylistId}`} class="see-more-link">
+                  zeldaVideos.length > 4 && (
+                    <article class="card playlist-card carousel-slide see-more-slide" style="--thumb-url: url('/zelda-bg.jpg')">
+                      <a href={`/playlist/${zeldaPlaylistId}`} class="see-more-link">
                         <div class="see-more-content">
                           <span class="icon">➜</span>
                           <h3>Ver serie completa</h3>
